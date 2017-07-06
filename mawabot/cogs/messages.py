@@ -21,7 +21,7 @@ __all__ = [
 
 class Messages:
     __slots__ = (
-        'bots',
+        'bot',
     )
 
     def __init__(self, bot):
@@ -30,13 +30,20 @@ class Messages:
     # Helper methods
     @staticmethod
     async def _get_messages(self, chan, ids):
-        pass
+        messages = []
+        async for msg in channel.history():
+            try:
+                messages.append((ids.index(msg.id), msg))
+            except ValueError:
+                pass
+
+        return map(lambda t: t[1], sorted(messages))
 
     # Commands
     @commands.command
     async def hit(self, ctx, *, content: str):
         fut = ctx.message.delete()
-        await ctx.send(content, delete_after=0)
+        await ctx.send(content=content, delete_after=0)
         await fut
 
     @commands.command

@@ -24,7 +24,7 @@ EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
 
 class Info:
     __slots__ = (
-        'bots',
+        'bot',
     )
 
     def __init__(self, bot):
@@ -36,15 +36,19 @@ class Info:
         for arg in args:
             match = EMOJI_REGEX.match(arg)
             if match:
-                await ctx.send(f'Emoji: `{match[1]}`\nID: `{match[2]}`')
+                await ctx.send(content=f'Emoji: `{match[1]}`\nID: `{match[2]}`')
             else:
                 try:
                     name = unicodedata.name(arg)
-                    await ctx.send(f'Unicode name: `{name}`\nOrd: `{ord(name)}`')
+                    await ctx.send(content=f'Unicode name: `{name}`\nOrd: `{ord(name)}`')
                 except:
                     self.logger.warn(f'Not an emoji: {arg}')
 
+    @commands.command
+    async def uptime(self, ctx):
+        await ctx.edit(content=self.bot.uptime)
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
-    cog = Guild(bot)
+    cog = Info(bot)
     bot.add_cog(cog)
