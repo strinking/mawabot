@@ -33,14 +33,6 @@ class Guild:
 
     # Helper methods
     @staticmethod
-    async def _guild_check(ctx):
-        if ctx.guild is None:
-            embed = discord.Embed(type='rich', description='This is not a guild.')
-            await ctx.send(embed=embed)
-
-        return bool(ctx.guild)
-
-    @staticmethod
     async def _get_role(guild, name):
         id = None
 
@@ -67,11 +59,9 @@ class Guild:
 
     # Commands
     @commands.command()
+    @commands.guild_only()
     async def ginfo(self, ctx):
         ''' Prints information about the current guild '''
-
-        if not await self._guild_check(ctx):
-            return
 
         text_count = len(ctx.guild.text_channels)
         voice_count = len(ctx.guild.voice_channels)
@@ -98,11 +88,9 @@ class Guild:
         await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.guild_only()
     async def roles(self, ctx):
         ''' Lists all the roles and their IDs '''
-
-        if not await self._guild_check(ctx):
-            return
 
         lines = []
         for role in ctx.guild.role_hierarchy:
@@ -118,11 +106,9 @@ class Guild:
             await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.guild_only()
     async def rinfo(self, ctx, name: str):
         ''' Prints more detailed information about a role '''
-
-        if not await self._guild_check(ctx):
-            return
 
         role = await self._get_role(ctx.guild, name)
 
