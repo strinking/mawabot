@@ -79,6 +79,7 @@ class Messages:
             embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
             embed.timestamp = msg.created_at
             await self.bot._send(embed=embed)
+
         await fut
 
     @commands.command()
@@ -86,7 +87,6 @@ class Messages:
         ''' Adds a separator between posts, X posts back '''
 
         fut = ctx.message.delete()
-
         async for msg in ctx.channel.history(limit=posts_back + 1):
             pass
 
@@ -95,6 +95,14 @@ class Messages:
             await msg.edit(content=content)
 
         await fut
+
+    @commands.command()
+    async def delet(self, ctx, posts: int = 1):
+        ''' Deletes the last X posts, including this one '''
+
+        async for msg in ctx.channel.history(limit=posts + 1):
+            await msg.delete()
+        await ctx.message.delete()
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
