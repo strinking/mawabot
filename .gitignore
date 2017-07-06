@@ -1,0 +1,16 @@
+# Configuration
+/config.json
+
+# Artifacts
+__pycache__
+*.py[cdo]
+
+# Logging
+*.log
+
+# Misc
+.*.swp
+*.bak
+*~
+*#
+
