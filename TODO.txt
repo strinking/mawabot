@@ -1,0 +1,4 @@
+.embed text
+.uinfo [user]
+.purge message-count
+
