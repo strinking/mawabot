@@ -37,11 +37,11 @@ class Guild:
         if ctx.guild is None:
             embed = discord.Embed(type='rich', description='This is not a guild.')
             await ctx.send(embed=embed)
-            return False
-        return True
+
+        return bool(ctx.guild)
 
     @staticmethod
-    def _get_role(guild, name):
+    async def _get_role(guild, name):
         id = None
 
         if name == 'everyone':
@@ -55,8 +55,9 @@ class Guild:
                 id = int(match[1])
 
         if id is None:
+            name = name.lower()
             for role in guild.roles:
-                if role.name == name:
+                if role.name.lower() == name:
                     return role
         else:
             for role in guild.roles:
@@ -69,7 +70,7 @@ class Guild:
     async def ginfo(self, ctx):
         ''' Prints information about the current guild '''
 
-        if not self._guild_check(ctx):
+        if not await self._guild_check(ctx):
             return
 
         text_count = len(ctx.guild.text_channels)
@@ -87,7 +88,7 @@ class Guild:
             f'Emojis: `{emoji_count}`',
         ))
         embed = discord.Embed(type='rich', description=text)
-        if guild.icon_url:
+        if ctx.guild.icon_url:
             embed.set_thumbnail(url=ctx.guild.icon_url)
         embed.set_author(name=ctx.guild.name)
 
@@ -100,7 +101,7 @@ class Guild:
     async def roles(self, ctx):
         ''' Lists all the roles and their IDs '''
 
-        if not self._guild_check(ctx):
+        if not await self._guild_check(ctx):
             return
 
         lines = []
@@ -120,7 +121,10 @@ class Guild:
     async def rinfo(self, ctx, name: str):
         ''' Prints more detailed information about a role '''
 
-        role = self._get_role(ctx.guild, name)
+        if not await self._guild_check(ctx):
+            return
+
+        role = await self._get_role(ctx.guild, name)
 
         if role is None:
             desc = f'**No such role:** {name}'

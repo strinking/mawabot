@@ -55,7 +55,7 @@ class Messages:
         ''' Quotes the given post(s) '''
 
         fut = ctx.message.delete()
-        to_quote = await self._get_messages(message.channel, ids)
+        to_quote = await self._get_messages(ctx.channel, ids)
         for msg in to_quote:
             embed = discord.Embed(type='rich', description=msg.content)
             embed.set_author(name=msg.author.display_name)

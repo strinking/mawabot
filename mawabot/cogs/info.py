@@ -12,6 +12,7 @@
 
 ''' Has several commands that get guild information '''
 import re
+import unicodedata
 
 import discord
 from discord.ext import commands
@@ -32,19 +33,19 @@ class Info:
 
     # Commands
     @commands.command()
-    async def emoji(self, ctx, *args: str):
+    async def emoji(self, ctx, *emojis: str):
         ''' Gets information about the given emoji(s) '''
 
-        for arg in args:
-            match = EMOJI_REGEX.match(arg)
+        for emoji in emojis:
+            match = EMOJI_REGEX.match(emoji)
             if match:
                 await ctx.send(content=f'Emoji: `{match[1]}`\nID: `{match[2]}`')
             else:
                 try:
-                    name = unicodedata.name(arg)
+                    name = unicodedata.name(emoji)
                     await ctx.send(content=f'Unicode name: `{name}`\nOrd: `{ord(name)}`')
                 except:
-                    self.logger.warn(f'Not an emoji: {arg}')
+                    self.bot.logger.warn(f'Not an emoji: {emoji}')
 
     @commands.command()
     async def uptime(self, ctx):
