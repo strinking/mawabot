@@ -44,7 +44,7 @@ class Bot(commands.Bot):
         self.start_time = datetime.datetime.utcnow()
         self.output_chan = None
         super().__init__(command_prefix=config['prefix'],
-                         description='maware\'s self bot to do stuff',
+                         description='maware\'s self-bot',
                          pm_help=False,
                          self_bot=True)
 
