@@ -1,4 +1,5 @@
 .embed text
 .uinfo [user]
-.purge [message-count]
+.purge message-count
+.sep [posts-back]
 
