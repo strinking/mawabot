@@ -38,20 +38,29 @@ class Info:
 
         for emoji in emojis:
             match = EMOJI_REGEX.match(emoji)
+            lines = [emoji]
             if match:
-                await ctx.send(content=f'Emoji: `{match[1]}`\nID: `{match[2]}`')
+                lines.append(f'Emoji: `{match[1]}`')
+                lines.append(f'ID: `{match[2]}`')
             else:
                 try:
                     name = unicodedata.name(emoji)
-                    await ctx.send(content=f'Unicode name: `{name}`\nOrd: `{ord(name)}`')
-                except:
-                    self.bot.logger.warn(f'Not an emoji: {emoji}')
+                    lines.append(f'Unicode name: `{name}`')
+                    try:
+                        lines.append(f'Ord: `{ord(name)}`')
+                    except:
+                        pass
+                except TypeError:
+                    lines.append('Not an emoji')
+
+            await ctx.send(content='\n'.join(lines))
 
     @commands.command()
     async def uptime(self, ctx):
         ''' Gets the uptime of this self-bot '''
 
-        await ctx.message.edit(content=self.bot.uptime)
+        uptime = str(self.bot.uptime).split('.')[0]
+        await ctx.message.edit(content=f'`{uptime}`')
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
