@@ -51,6 +51,17 @@ class General:
         result = upsidedown.transform(text)
         await ctx.message.edit(content=f'{result}')
 
+    @commands.command()
+    async def sw(self, ctx, *, text: str):
+        ''' Spaces out a sentence for meme emphasis '''
+
+        words = text.split(' ')
+        result = []
+        for word in words:
+            result.append(' '.join(word))
+
+        await ctx.message.edit(content=' . '.join(result))
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = General(bot)
