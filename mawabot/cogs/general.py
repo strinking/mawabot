@@ -13,14 +13,21 @@
 ''' Holds general commands for self bot '''
 
 from random import randint
+import re
 
 import discord
 from discord.ext import commands
 import upsidedown
 
+__all__ = [
+    'setup',
+]
 
 class General:
-    ''' Holds commands that don't have a suitable place else where '''
+    __slots__ = (
+        'bot',
+    )
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,7 +35,7 @@ class General:
     async def ping(self, ctx):
         ''' Pong '''
 
-        await ctx.message.edit(content='Pong')
+        await ctx.message.edit(content='Pong!')
 
     @commands.command()
     async def roll(self, ctx, number: int = 10):
