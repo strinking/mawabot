@@ -47,7 +47,7 @@ class Messages:
         await fut
 
     @commands.command
-    async def cmd_quote(self, ctx, *ids: int):
+    async def quote(self, ctx, *ids: int):
         fut = ctx.message.delete()
         to_quote = await self._get_messages(message.channel, ids)
         for msg in to_quote:
@@ -57,7 +57,7 @@ class Messages:
         await fut
 
     @commands.command
-    async def cmd_dump(self, ctx, *ids: int):
+    async def dump(self, ctx, *ids: int):
         fut = ctx.message.delete()
         to_copy = await self._get_messages(message.channel, args)
         for msg in to_copy:
