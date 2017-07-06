@@ -72,7 +72,7 @@ class Bot(commands.Bot):
 
         if self.config['output-channel'] is None:
             self.logger.warn('No output channel set in config.')
-            self.output_chan = self.get_channel(self.config['output-channel'])
+            self.output_chan = self.get_channel(int(self.config['output-channel']))
 
         for cog in COGS:
             self.load_extension(cog)
