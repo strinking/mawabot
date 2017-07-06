@@ -62,6 +62,15 @@ class General:
 
         await ctx.message.edit(content=' . '.join(result))
 
+    @commands.command()
+    async def cw(self, ctx, *, text: str):
+        ''' "Crossword"-ifys the given text for meme emphasis '''
+
+        text = text.upper()
+        lines = [text] + list(text[1:])
+
+        await ctx.message.edit(content='\n'.join(lines))
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = General(bot)
