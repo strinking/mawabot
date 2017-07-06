@@ -79,7 +79,7 @@ class Guild:
         text = '\n'.join((
             f'Created: `{created}`',
             f'Text Channels: `{text_count}`',
-            f'Voice Channels: `{voice_count}`')
+            f'Voice Channels: `{voice_count}`',
             f'Members: `{ctx.guild.member_count}`',
             f'Roles: `{role_count}`',
             f'Emojis: `{emoji_count}`',
