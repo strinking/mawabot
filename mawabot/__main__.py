@@ -49,8 +49,8 @@ if __name__ == '__main__':
         log_hndl.setFormatter(log_fmtr)
         logger.addHandler(log_hndl)
         if args.debug:
-            dis_logger.addHandler(log_hndl)            
- 
+            dis_logger.addHandler(log_hndl)
+
     try:
         # Load config
         with open(args.config_file, 'r') as jsonfile:
