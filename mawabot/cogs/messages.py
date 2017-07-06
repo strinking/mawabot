@@ -29,7 +29,7 @@ class Messages:
 
     # Helper methods
     @staticmethod
-    async def _get_messages(self, channel, ids):
+    async def _get_messages(channel, ids):
         ''' Gets a list of the messages with the given IDs, in that order '''
 
         messages = []
@@ -67,7 +67,7 @@ class Messages:
         ''' Outputs the literal contents of the given post(s) '''
 
         fut = ctx.message.delete()
-        to_copy = await self._get_messages(ctx.channel, args)
+        to_copy = await self._get_messages(ctx.channel, ids)
         for msg in to_copy:
             content = '\n'.join((
                 '```',

@@ -72,6 +72,7 @@ class Bot(commands.Bot):
 
         if self.config['output-channel'] is None:
             self.logger.warn('No output channel set in config.')
+        else:
             self.output_chan = self.get_channel(int(self.config['output-channel']))
 
         for cog in COGS:
@@ -88,5 +89,7 @@ class Bot(commands.Bot):
         self.logger.info('Ready!')
 
     async def _send(self, *args, **kwargs):
-        if self.output_chan is not None:
+        if self.output_chan is None:
+            self.logger.warn("No output channel set!")
+        else:
             self.output_chan.send(*args, **kwargs)
