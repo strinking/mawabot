@@ -1,0 +1,5 @@
+.embed text
+.uinfo [user]
+.purge message-count
+.sep [posts-back]
+
