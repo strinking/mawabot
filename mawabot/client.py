@@ -90,6 +90,6 @@ class Bot(commands.Bot):
 
     async def _send(self, *args, **kwargs):
         if self.output_chan is None:
-            self.logger.warn("No output channel set!")
+            self.logger.warn('No output channel set!')
         else:
-            self.output_chan.send(*args, **kwargs)
+            await self.output_chan.send(*args, **kwargs)
