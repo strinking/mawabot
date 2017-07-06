@@ -81,6 +81,21 @@ class Messages:
             await self.bot._send(embed=embed)
         await fut
 
+    @commands.command()
+    async def sep(self, ctx, posts_back: int = 1):
+        ''' Adds a separator between posts, X posts back '''
+
+        fut = ctx.message.delete()
+
+        async for msg in ctx.channel.history(limit=posts_back + 1):
+            pass
+
+        if not msg.content.startswith('.\n'):
+            content = '.\n' + msg.content
+            await msg.edit(content=content)
+
+        await fut
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = Messages(bot)
