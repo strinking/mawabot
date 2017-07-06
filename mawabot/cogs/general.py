@@ -46,7 +46,7 @@ class General:
 
     @commands.command()
     async def upsidedown(self, ctx, *, text: str):
-        ''' Gives a random number from 0 to the number given '''
+        ''' Prints the given text upside down '''
 
         result = upsidedown.transform(text)
         await ctx.message.edit(content=f'{result}')

@@ -31,8 +31,10 @@ class Info:
         self.bot = bot
 
     # Commands
-    @commands.command
+    @commands.command()
     async def emoji(self, ctx, *args: str):
+        ''' Gets information about the given emoji(s) '''
+
         for arg in args:
             match = EMOJI_REGEX.match(arg)
             if match:
@@ -44,9 +46,11 @@ class Info:
                 except:
                     self.logger.warn(f'Not an emoji: {arg}')
 
-    @commands.command
+    @commands.command()
     async def uptime(self, ctx):
-        await ctx.edit(content=self.bot.uptime)
+        ''' Gets the uptime of this self-bot '''
+
+        await ctx.message.edit(content=self.bot.uptime)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''

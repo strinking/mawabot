@@ -65,8 +65,10 @@ class Guild:
         return None
 
     # Commands
-    @commands.command
+    @commands.command()
     async def ginfo(self, ctx):
+        ''' Prints information about the current guild '''
+
         if not self._guild_check(ctx):
             return
 
@@ -94,8 +96,10 @@ class Guild:
 
         await ctx.send(embed=embed)
 
-    @commands.command
+    @commands.command()
     async def roles(self, ctx):
+        ''' Lists all the roles and their IDs '''
+
         if not self._guild_check(ctx):
             return
 
@@ -112,8 +116,10 @@ class Guild:
             embed = discord.Embed(type='rich', description='\n'.join(lines))
             await ctx.send(embed=embed)
 
-    @commands.command
+    @commands.command()
     async def rinfo(self, ctx, name: str):
+        ''' Prints more detailed information about a role '''
+
         role = self._get_role(ctx.guild, name)
 
         if role is None:

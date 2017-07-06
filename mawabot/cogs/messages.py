@@ -30,6 +30,8 @@ class Messages:
     # Helper methods
     @staticmethod
     async def _get_messages(self, chan, ids):
+        ''' Gets a list of the messages with the given IDs, in that order '''
+
         messages = []
         async for msg in channel.history():
             try:
@@ -40,14 +42,18 @@ class Messages:
         return map(lambda t: t[1], sorted(messages))
 
     # Commands
-    @commands.command
+    @commands.command()
     async def hit(self, ctx, *, content: str):
+        ''' Sends the given message and then immediately deletes it '''
+
         fut = ctx.message.delete()
         await ctx.send(content=content, delete_after=0)
         await fut
 
-    @commands.command
+    @commands.command()
     async def quote(self, ctx, *ids: int):
+        ''' Quotes the given post(s) '''
+
         fut = ctx.message.delete()
         to_quote = await self._get_messages(message.channel, ids)
         for msg in to_quote:
@@ -56,8 +62,10 @@ class Messages:
             await ctx.send(embed=embed)
         await fut
 
-    @commands.command
+    @commands.command()
     async def dump(self, ctx, *ids: int):
+        ''' Outputs the literal contents of the given post(s) '''
+
         fut = ctx.message.delete()
         to_copy = await self._get_messages(message.channel, args)
         for msg in to_copy:

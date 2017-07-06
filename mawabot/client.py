@@ -84,7 +84,7 @@ class Bot(commands.Bot):
         self.logger.info(f'* {len(self.guilds)} guilds')
         self.logger.info(f'* {channels} channels')
         self.logger.info(f'* {len(self.users)} users')
-        self.logger.info('')
+        self.logger.info('-----')
         self.logger.info('Ready!')
 
     async def _send(self, *args, **kwargs):
