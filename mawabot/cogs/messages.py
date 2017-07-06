@@ -58,7 +58,8 @@ class Messages:
         to_quote = await self._get_messages(ctx.channel, ids)
         for msg in to_quote:
             embed = discord.Embed(type='rich', description=msg.content)
-            embed.set_author(name=msg.author.display_name)
+            embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
+            embed.timestamp = msg.created_at
             await ctx.send(embed=embed)
         await fut
 
@@ -75,7 +76,8 @@ class Messages:
                 '```',
             ))
             embed = discord.Embed(type='rich', description=content)
-            embed.set_author(name=msg.author.display_name)
+            embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
+            embed.timestamp = msg.created_at
             await self.bot._send(embed=embed)
         await fut
 
