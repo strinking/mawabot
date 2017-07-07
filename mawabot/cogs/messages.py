@@ -60,17 +60,24 @@ class Messages:
         await ctx.message.edit(content='', embed=embed)
 
     @commands.command()
-    async def quote(self, ctx, *ids: int):
+    async def quote(self, ctx, id: int, cid: int = 0):
         ''' Quotes the given post(s) '''
 
-        fut = ctx.message.delete()
-        to_quote = await self._get_messages(ctx.channel, ids)
+        await ctx.message.delete()
+        if cid:
+            channel = self.bot.get_channel(cid)
+            if channel is None:
+                self.logger.warn(f'Cannot find the channel with ID {cid}')
+                return
+        else:
+            channel = ctx.channel
+
+        to_quote = await self._get_messages(channel, (id,))
         for msg in to_quote:
             embed = discord.Embed(type='rich', description=msg.content)
             embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
             embed.timestamp = msg.created_at
             await ctx.send(embed=embed)
-        await fut
 
     @commands.command()
     async def dump(self, ctx, *ids: int):
