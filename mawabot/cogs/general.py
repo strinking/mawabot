@@ -69,10 +69,9 @@ class General:
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
     @commands.command()
-    async def nick(self, ctx):
+    @commands.guild_only()
+    async def nick(self, ctx, *, nickname: str):
         ''' Changes the users nickname '''
-        # I did this to allow nicknames with spaces, change it if you like
-        nickname = " ".join(ctx.message.content.split(" ")[1:])
         await ctx.message.guild.get_member(self.bot.user.id).edit(nick=nickname)
 
 def setup(bot):
