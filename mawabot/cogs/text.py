@@ -11,8 +11,11 @@
 #
 
 ''' Has commands for text transformation '''
+import codecs
+
 import discord
 from discord.ext import commands
+import upsidedown
 
 __all__ = [
     'setup',

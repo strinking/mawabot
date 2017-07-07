@@ -48,7 +48,7 @@ if __name__ == '__main__':
     log_hndl.setFormatter(log_fmtr)
     log_level = logging.INFO
 
-    logger = logging.getLogger('mawabot')
+    logger = logging.getLogger(__package__)
     logger.setLevel(level=log_level)
     logger.addHandler(log_hndl)
 
@@ -74,5 +74,5 @@ if __name__ == '__main__':
 
     # Open and run client
     logger.info("Starting bot...")
-    bot = client.Bot(config, logger)
+    bot = client.Bot(config)
     bot.run()

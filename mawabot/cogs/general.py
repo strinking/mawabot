@@ -11,7 +11,6 @@
 #
 
 ''' Holds general commands for self bot '''
-import codecs
 import random
 import re
 
@@ -19,7 +18,6 @@ from .. import calc
 
 import discord
 from discord.ext import commands
-import upsidedown
 
 __all__ = [
     'setup',
@@ -71,6 +69,7 @@ class General:
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
     @commands.command()
+
     async def calc(self, ctx, *, expr: str):
         ''' Evaluates a mathematical expression and prints the result '''
 
@@ -88,6 +87,11 @@ class General:
 
         await ctx.send(embed=embed)
         await fut
+
+    @commands.guild_only()
+    async def nick(self, ctx, *, nickname: str):
+        ''' Changes the users nickname '''
+        await ctx.guild.get_member(self.bot.user.id).edit(nick=nickname)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''

@@ -12,6 +12,8 @@
 
 ''' Has several commands that deal with messages '''
 
+import logging
+
 import discord
 from discord.ext import commands
 
@@ -20,6 +22,8 @@ __all__ = [
 ]
 
 MAX_DELETE_POSTS = 30
+
+logger = logging.getLogger(__name__)
 
 class Messages:
     __slots__ = (
@@ -67,7 +71,7 @@ class Messages:
         if cid:
             channel = self.bot.get_channel(cid)
             if channel is None:
-                self.logger.warn(f'Cannot find the channel with ID {cid}')
+                logger.warn(f'Cannot find the channel with ID {cid}')
                 return
         else:
             channel = ctx.channel
@@ -110,8 +114,8 @@ class Messages:
         ''' Deletes the last X posts, including the trigger '''
 
         if posts > MAX_DELETE_POSTS:
-            self.logger.error((f'Asked to delete {posts} posts which is greater than '
-                                f'the self-imposed limit of {MAX_DELETE_POSTS}'))
+            logger.error((f'Asked to delete {posts} posts which is greater than '
+                          f'the self-imposed limit of {MAX_DELETE_POSTS}'))
 
         async for msg in ctx.channel.history(limit=posts + 1):
             await msg.delete()
