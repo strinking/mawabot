@@ -15,6 +15,8 @@ import codecs
 import random
 import re
 
+from .. import calc
+
 import discord
 from discord.ext import commands
 import upsidedown
@@ -67,6 +69,13 @@ class General:
 
             rolls = ' + '.join(rolls)
             await ctx.send(content=f'🎲 {rolls} = {total}')
+
+    @commands.command()
+    async def calc(self, ctx, *, expr: str):
+        ''' Evaluates a mathematical expression and prints the result '''
+
+        # TODO
+        calc.parser
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
