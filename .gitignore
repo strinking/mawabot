@@ -5,6 +5,10 @@
 __pycache__
 *.py[cdo]
 
+lextab.py
+parser.out
+parsetab.py
+
 # Logging
 *.log
 

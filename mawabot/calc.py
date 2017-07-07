@@ -10,8 +10,10 @@
 # WITHOUT ANY WARRANTY. See the LICENSE file for more details.
 #
 
+''' The parser and lexer definitions for the calculator '''
 import ply.lex as lex
 import ply.yacc as yacc
+import re
 
 # Token list
 tokens = (
@@ -59,7 +61,7 @@ def t_FLOAT(t):
     return t
 
 def t_error(t):
-    # try and ignore errors
+    logger.warn(f'Illegal character: {t.value[0]}')
     t.lexer
 
 # Grammar definition
@@ -124,6 +126,13 @@ def p_expr_float(p):
     'expr : FLOAT'
 
     p[0] = p[1]
+
+def p_error(p):
+    if p:
+        logger.warn(f'Syntax error at token {p.type}')
+        parser.errok()
+    else:
+        logger.warn('Syntax error at EOF')
 
 # Build them
 lexer = lex.lex(optimize=1, reflags=re.IGNORECASE)
