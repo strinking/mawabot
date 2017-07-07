@@ -25,6 +25,7 @@ COGS = [
     'mawabot.cogs.guild',
     'mawabot.cogs.info',
     'mawabot.cogs.messages',
+    'mawabot.cogs.programming',
     'mawabot.cogs.text',
 ]
 
