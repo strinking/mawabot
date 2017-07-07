@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY. See the LICENSE file for more details.
 #
 
-''' Has several commands that deal with messages and text '''
+''' Has several commands that deal with messages '''
 
 import discord
 from discord.ext import commands
@@ -99,22 +99,8 @@ class Messages:
         await fut
 
     @commands.command()
-    async def sep(self, ctx, posts_back: int = 1):
-        ''' Adds a separator between posts, X posts back '''
-
-        fut = ctx.message.delete()
-        async for msg in ctx.channel.history(limit=posts_back + 1):
-            pass
-
-        if not msg.content.startswith('.\n'):
-            content = '.\n' + msg.content
-            await msg.edit(content=content)
-
-        await fut
-
-    @commands.command()
     async def delet(self, ctx, posts: int = 1):
-        ''' Deletes the last X posts, including this one '''
+        ''' Deletes the last X posts, including the trigger '''
 
         if posts > MAX_DELETE_POSTS:
             self.logger.error((f'Asked to delete {posts} posts which is greater than '

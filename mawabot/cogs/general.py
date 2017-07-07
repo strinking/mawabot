@@ -45,40 +45,6 @@ class General:
         result = randint(0, number)
         await ctx.message.edit(content=f'Rolled: {result}')
 
-    @commands.command()
-    async def upsidedown(self, ctx, *, text: str):
-        ''' Prints the given text upside down '''
-
-        result = upsidedown.transform(text)
-        await ctx.message.edit(content=result)
-
-    @commands.command()
-    async def rot13(self, ctx, *, text: str):
-        ''' Rot13's the given text '''
-
-        result = codecs.encode(text, 'rot_13')
-        await ctx.message.edit(content=result)
-
-    @commands.command()
-    async def sw(self, ctx, *, text: str):
-        ''' Spaces out a sentence for meme emphasis '''
-
-        words = text.split(' ')
-        result = []
-        for word in words:
-            result.append(' '.join(word))
-
-        await ctx.message.edit(content=' . '.join(result))
-
-    @commands.command()
-    async def cw(self, ctx, *, text: str):
-        ''' "Crossword"-ifys the given text for meme emphasis '''
-
-        text = text.upper()
-        lines = [text] + list(text[1:])
-
-        await ctx.message.edit(content='\n'.join(lines))
-
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = General(bot)
