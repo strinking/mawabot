@@ -23,7 +23,7 @@ __all__ = [
     'setup',
 ]
 
-DICE_REGEX = re.compile(r'([0-9]+)?\s*d\s*([0-9]+)', re.IGNORECASE)
+DICE_REGEX = re.compile(r'(?:([0-9]+)?\s*d)?\s*([0-9]+)', re.IGNORECASE)
 
 class General:
     __slots__ = (
@@ -56,7 +56,7 @@ class General:
 
         if dice == 1:
             result = random.randint(1, sides)
-            await ctx.message.edit(content=f'🎲 {result}')
+            await ctx.send(content=f'🎲 {result}')
         else:
             rolls = []
             total = 0
@@ -65,9 +65,8 @@ class General:
                 rolls.append(f'{result}')
                 total += result
 
-            original = ctx.message.content
             rolls = ' + '.join(rolls)
-            await ctx.message.edit(content=f'{original}\n🎲 {rolls} = {total}')
+            await ctx.send(content=f'🎲 {rolls} = {total}')
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
