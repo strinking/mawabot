@@ -89,46 +89,42 @@ class Guild:
 
     @commands.command()
     @commands.guild_only()
-    async def roles(self, ctx):
-        ''' Lists all the roles and their IDs '''
+    async def rinfo(self, ctx, *, name: str = None):
+        ''' Lists information about roles on the guild '''
 
-        lines = []
-        for role in ctx.guild.role_hierarchy:
-            lines.append(f'{role.mention}: {role.id}')
+        if name is None:
+            lines = []
+            for role in ctx.guild.role_hierarchy:
+                lines.append(f'{role.mention}: {role.id}')
 
-            if len(lines) > 20:
+                if len(lines) > 20:
+                    embed = discord.Embed(type='rich', description='\n'.join(lines))
+                    await ctx.send(embed=embed)
+                    lines = []
+
+            if lines:
                 embed = discord.Embed(type='rich', description='\n'.join(lines))
                 await ctx.send(embed=embed)
-                lines = []
-
-        if lines:
-            embed = discord.Embed(type='rich', description='\n'.join(lines))
-            await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.guild_only()
-    async def rinfo(self, ctx, name: str):
-        ''' Prints more detailed information about a role '''
-
-        role = await self._get_role(ctx.guild, name)
-
-        if role is None:
-            desc = f'**No such role:** {name}'
-            embed = discord.Embed(type='rich', description=desc, color=discord.Color.red())
         else:
-            desc = '\n'.join((
-                role.mention,
-                f'ID: {role.id}',
-                f'Created: {role.created_at}',
-                f'Members: {len(role.members)}',
-                f'Hoisted: {role.hoist}',
-                f'Position: {role.position}',
-                f'Mentionable: {role.mentionable}',
-            ))
-            embed = discord.Embed(type='rich', description=desc, color=role.color)
-            embed.set_author(name=role.name)
+            role = await self._get_role(ctx.guild, name)
 
-        await ctx.send(embed=embed)
+            if role is None:
+                desc = f'**No such role:** {name}'
+                embed = discord.Embed(type='rich', description=desc, color=discord.Color.red())
+            else:
+                desc = '\n'.join((
+                    role.mention,
+                    f'ID: {role.id}',
+                    f'Created: {role.created_at}',
+                    f'Members: {len(role.members)}',
+                    f'Hoisted: {role.hoist}',
+                    f'Position: {role.position}',
+                    f'Mentionable: {role.mentionable}',
+                ))
+                embed = discord.Embed(type='rich', description=desc, color=role.color)
+                embed.set_author(name=role.name)
+
+            await ctx.send(embed=embed)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
