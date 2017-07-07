@@ -11,8 +11,8 @@
 #
 
 ''' Holds general commands for self bot '''
-from random import randint
 import codecs
+import random
 import re
 
 import discord
@@ -22,6 +22,8 @@ import upsidedown
 __all__ = [
     'setup',
 ]
+
+DICE_REGEX = re.compile(r'([0-9]+)?\s*d\s*([0-9]+)', re.IGNORECASE)
 
 class General:
     __slots__ = (
@@ -38,11 +40,34 @@ class General:
         await ctx.message.edit(content='Pong!')
 
     @commands.command()
-    async def roll(self, ctx, number: int = 10):
-        ''' Gives a random number from 0 to the number given '''
+    async def roll(self, ctx, *, roll: str = ''):
+        ''' "XdY" rolls X dice with Y sides '''
 
-        result = randint(0, number)
-        await ctx.message.edit(content=f'Rolled: {result}')
+        if roll:
+            match = DICE_REGEX.match(roll)
+            if match is None:
+                return
+
+            dice = int(match[1]) if match[1] else 1
+            sides = int(match[2])
+        else:
+            dice = 1
+            sides = 6
+
+        if dice == 1:
+            result = random.randint(1, sides)
+            await ctx.message.edit(content=f'🎲 {result}')
+        else:
+            rolls = []
+            total = 0
+            for _ in range(dice):
+                result = random.randint(1, sides)
+                rolls.append(f'{result}')
+                total += result
+
+            original = ctx.message.content
+            rolls = ' + '.join(rolls)
+            await ctx.message.edit(content=f'{original}\n🎲 {rolls} = {total}')
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
