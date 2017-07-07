@@ -70,15 +70,22 @@ class Messages:
         fut = ctx.message.delete()
         to_copy = await self._get_messages(ctx.channel, ids)
         for msg in to_copy:
-            content = '\n'.join((
-                '```',
-                msg.content.replace("`", "'"),
-                '```',
-            ))
+            if msg.content:
+                content = '\n'.join((
+                    '```',
+                    msg.content.replace("`", "'"),
+                    '```',
+                ))
+            else:
+                content = '(Message is empty)'
+
             embed = discord.Embed(type='rich', description=content)
             embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
             embed.timestamp = msg.created_at
             await self.bot._send(embed=embed)
+
+            for embed in msg.embeds:
+                await self.bot._send(embed=embed)
 
         await fut
 
