@@ -89,6 +89,9 @@ class Bot(commands.Bot):
         self.logger.info('------')
         self.logger.info('Ready!')
 
+        await self.change_presence(status=discord.Status.invisible)
+        self.logger.info('Setting status to invisible')
+
     async def _send(self, *args, **kwargs):
         if self.output_chan is None:
             self.logger.warn('No output channel set!')
