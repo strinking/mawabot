@@ -87,18 +87,14 @@ class Info:
             users = self._get_members(ctx.guild, names)
 
         for user in users:
-            lines = [
-                f'{user.mention} - `{user.id}`',
-            ]
+            lines = [user.mention]
 
             if isinstance(user, discord.Member):
-                lines.append(f'Status: {user.status}')
-
                 if user.game:
                     if user.game.type == 1:
-                        lines.append(f'Streaming {user.game.url}')
+                        lines.append(f'Streaming `{user.game.url}`')
                     else:
-                        lines.append(f'Playing {user.game.name}')
+                        lines.append(f'Playing `{user.game.name}`')
 
                 if user.voice:
                     mute = user.voice.mute or user.voice.self_mute
@@ -125,12 +121,15 @@ class Info:
                     lines.append(f'Roles: {roles}')
 
             embed = discord.Embed(type='rich', description='\n'.join(lines))
+            embed.timestamp = user.created_at
             if hasattr(user, 'color'):
                 embed.color = user.color
 
             name = f'{user.name}#{user.discriminator}'
-            embed.set_author(name=name, icon_url=user.avatar_url)
-            embed.timestamp = user.created_at
+            embed.set_author(name=name)
+            embed.set_thumbnail(url=user.avatar_url)
+            embed.add_field(name='Status:', value=user.status)
+            embed.add_field(name='ID:', value=f'`{user.id}`')
             await ctx.send(embed=embed)
 
     @commands.command()
