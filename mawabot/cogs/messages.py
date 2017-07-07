@@ -19,6 +19,8 @@ __all__ = [
     'setup',
 ]
 
+MAX_DELETE_POSTS = 30
+
 class Messages:
     __slots__ = (
         'bot',
@@ -113,6 +115,10 @@ class Messages:
     @commands.command()
     async def delet(self, ctx, posts: int = 1):
         ''' Deletes the last X posts, including this one '''
+
+        if posts > MAX_DELETE_POSTS:
+            self.logger.error((f'Asked to delete {posts} posts which is greater than '
+                                f'the self-imposed limit of {MAX_DELETE_POSTS}'))
 
         async for msg in ctx.channel.history(limit=posts + 1):
             await msg.delete()

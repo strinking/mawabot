@@ -13,6 +13,7 @@
 ''' Holds general commands for self bot '''
 
 from random import randint
+import codecs
 import re
 
 import discord
@@ -49,7 +50,14 @@ class General:
         ''' Prints the given text upside down '''
 
         result = upsidedown.transform(text)
-        await ctx.message.edit(content=f'{result}')
+        await ctx.message.edit(content=result)
+
+    @commands.command()
+    async def rot13(self, ctx, *, text: str):
+        ''' Rot13's the given text '''
+
+        result = codecs.encode(text, 'rot_13')
+        await ctx.message.edit(content=result)
 
     @commands.command()
     async def sw(self, ctx, *, text: str):
