@@ -38,6 +38,10 @@ class Info:
 
         users = []
         for name in names:
+            if name == 'me':
+                users.append(self.bot.user)
+                continue
+
             try:
                 id = int(name)
                 user = self.bot.get_user(id)
@@ -56,6 +60,10 @@ class Info:
 
         members = []
         for name in names:
+            if name == 'me':
+                members.append(guild.me)
+                continue
+
             try:
                 id = int(name)
                 member = guild.get_member(id)
