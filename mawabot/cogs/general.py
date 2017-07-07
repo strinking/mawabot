@@ -11,7 +11,6 @@
 #
 
 ''' Holds general commands for self bot '''
-
 from random import randint
 import codecs
 import re

@@ -70,10 +70,9 @@ class Info:
                 if member:
                     members.append(member)
             except ValueError:
-                for member in guild.members:
-                    if member.name == name or member.nick == name:
-                        members.append(member)
-                        break
+                member = guild.get_member_named(name)
+                if member:
+                    members.append(member)
         return members
 
     # Commands
