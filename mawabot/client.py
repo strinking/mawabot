@@ -16,6 +16,7 @@ Holds the custom discord client
 '''
 
 import datetime
+import logging
 
 import discord
 from discord.ext import commands
@@ -28,6 +29,7 @@ COGS = [
     'mawabot.cogs.text',
 ]
 
+logger = logging.getLogger(__name__)
 
 class Bot(commands.Bot):
     ''' The custom discord ext bot '''
@@ -39,9 +41,8 @@ class Bot(commands.Bot):
         'output_chan',
     )
 
-    def __init__(self, config, logger):
+    def __init__(self, config):
         self.config = config
-        self.logger = logger
         self.start_time = datetime.datetime.utcnow()
         self.output_chan = None
         super().__init__(command_prefix=config['prefix'],
@@ -61,7 +62,7 @@ class Bot(commands.Bot):
 
         if not self.config['token']:
             err_msg = 'Token is empty. Please open the config file and add your token!'
-            self.logger.critical(err_msg)
+            logger.critical(err_msg)
         else:
             return super().run(self.config['token'], bot=False)
 
@@ -72,28 +73,28 @@ class Bot(commands.Bot):
         '''
 
         if self.config['output-channel'] is None:
-            self.logger.warn('No output channel set in config.')
+            logger.warn('No output channel set in config.')
         else:
             self.output_chan = self.get_channel(int(self.config['output-channel']))
 
         for cog in COGS:
             self.load_extension(cog)
-            self.logger.info(f'Loaded cog: {cog}')
+            logger.info(f'Loaded cog: {cog}')
 
         channels = sum(1 for _ in self.get_all_channels())
-        self.logger.info(f'Logged in as {self.user.name} ({self.user.id})')
-        self.logger.info('Connected to:')
-        self.logger.info(f'* {len(self.guilds)} guilds')
-        self.logger.info(f'* {channels} channels')
-        self.logger.info(f'* {len(self.users)} users')
-        self.logger.info('------')
-        self.logger.info('Ready!')
+        logger.info(f'Logged in as {self.user.name} ({self.user.id})')
+        logger.info('Connected to:')
+        logger.info(f'* {len(self.guilds)} guilds')
+        logger.info(f'* {channels} channels')
+        logger.info(f'* {len(self.users)} users')
+        logger.info('------')
+        logger.info('Ready!')
 
         await self.change_presence(status=discord.Status.invisible)
-        self.logger.info('Setting status to invisible')
+        logger.info('Setting status to invisible')
 
     async def _send(self, *args, **kwargs):
         if self.output_chan is None:
-            self.logger.warn('No output channel set!')
+            logger.warn('No output channel set!')
         else:
             await self.output_chan.send(*args, **kwargs)
