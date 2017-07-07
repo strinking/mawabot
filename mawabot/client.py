@@ -24,7 +24,6 @@ COGS = [
     'mawabot.cogs.general',
     'mawabot.cogs.guild',
     'mawabot.cogs.info',
-    'mawabot.cogs.math',
     'mawabot.cogs.messages',
     'mawabot.cogs.text',
 ]

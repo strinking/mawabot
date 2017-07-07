@@ -55,13 +55,13 @@ t_COMMA   = r','
 t_ignore  = '` \f\t\n'
 
 def t_INT(t):
-    r'[+-]?[0-9]+'
+    r'[+-]\s*?[0-9]+'
 
     t.value = int(t.value)
     return t
 
 def t_FLOAT(t):
-    r'[+-]?(?:(?:[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)(?:[eE][+-][0-9]+)?|inf|nan)'
+    r'[+-]\s*?(?:(?:[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)(?:[eE][+-][0-9]+)?|inf|nan)'
 
     t.value = float(t.value)
     return t
@@ -73,10 +73,12 @@ def t_CONST(t):
     return t
 
 def t_FUNC(t):
-    r'abs|acos|acosh|asin|asinh|atan|ceil|cos|cosh|degrees|erf|erfc|exp|expm1|fabs|factorial|floor|gamma|log|log10|log1p|log2|radians|sin|sinh|sqrt|tan|tanh|trunc'
+    r'abs|acos|acosh|asin|asinh|atan|ceil|cos|cosh|degrees|erf|erfc|exp|expm1|fabs|factorial|floor|gamma|ln|log10|log1p|log2|radians|sin|sinh|sqrt|tan|tanh|trunc'
 
     if t.value == 'abs':
         t.value = abs
+    elif t.value == 'ln':
+        t.value = math.log
     t.value = getattr(math, t.value)
 
 def t_FUNC2(t):
@@ -88,7 +90,7 @@ def t_FUNC2(t):
 
 def t_error(t):
     print(f'Illegal character: {t.value[0]}')
-    t.lexer
+    return None
 
 # Grammar definition
 precedence = (
@@ -171,9 +173,9 @@ def p_expr_const(p):
 def p_error(p):
     if p:
         print(f'Syntax error at token {p.type}')
-        parser.errok()
     else:
         print('Syntax error at EOF')
+    raise SyntaxError
 
 # Build them
 lexer = lex.lex(optimize=1)

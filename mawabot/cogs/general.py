@@ -74,14 +74,20 @@ class General:
     async def calc(self, ctx, *, expr: str):
         ''' Evaluates a mathematical expression and prints the result '''
 
+        fut = ctx.message.delete()
+        embed = discord.Embed(type='rich')
+        embed.set_author(name=expr)
+
         try:
             result = calc.parser.parse(expr)
-            embed = discord.Embed(type='rich', description=f'= {result}')
+            embed.description = f'= {result}'
+            embed.color = discord.Color.teal()
         except:
-            embed = discord.Embed(type='rich', description='Error parsing expression')
+            embed.description = 'Error parsing expression'
             embed.color = discord.Color.red()
 
         await ctx.send(embed=embed)
+        await fut
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
