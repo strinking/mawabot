@@ -35,7 +35,11 @@ class Programming:
         ''' Allows arbitrary execution of Python code '''
 
         logger.info(f'Running python: "{command}"')
-        exec(command)
+        result = eval(command)
+        if result is not None:
+            embed = discord.Embed(type='rich', description=repr(result))
+            embed.set_author(name=command)
+            await ctx.send(embed=embed)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
