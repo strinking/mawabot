@@ -135,6 +135,6 @@ def p_error(p):
         logger.warn('Syntax error at EOF')
 
 # Build them
-lexer = lex.lex(optimize=1, reflags=re.IGNORECASE)
+lexer = lex.lex(optimize=1)
 parser = yacc.yacc(optimize=1)
 
