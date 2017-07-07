@@ -68,6 +68,12 @@ class General:
             rolls = ' + '.join(rolls)
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
+    @commands.command()
+    @commands.guild_only()
+    async def nick(self, ctx, *, nickname: str):
+        ''' Changes the users nickname '''
+        await ctx.message.guild.get_member(self.bot.user.id).edit(nick=nickname)
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = General(bot)
