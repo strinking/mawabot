@@ -1,3 +1,2 @@
 .embed text
-.uinfo [user]
 
