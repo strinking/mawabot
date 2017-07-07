@@ -11,9 +11,16 @@
 #
 
 ''' Has commands for programming '''
+import logging
 
 import discord
 from discord.ext import commands
+
+__all__ = [
+    'setup',
+]
+
+logger = logging.getLogger(__file__)
 
 class Programming:
     __slots__ = (
@@ -27,7 +34,7 @@ class Programming:
     async def exec(self, ctx, *, command: str):
         ''' Allows arbitrary execution of Python code '''
 
-        self.logger.info(f'Running python: "{command}"')
+        logger.info(f'Running python: "{command}"')
         exec(command)
 
 def setup(bot):
