@@ -51,6 +51,13 @@ class Messages:
         await fut
 
     @commands.command()
+    async def embed(self, ctx, *, content: str):
+        ''' Inserts the given message into an embed. '''
+
+        embed = discord.Embed(type='rich', description=content)
+        await ctx.message.edit(content='', embed=embed)
+
+    @commands.command()
     async def quote(self, ctx, *ids: int):
         ''' Quotes the given post(s) '''
 
