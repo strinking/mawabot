@@ -11,13 +11,11 @@
 #
 
 ''' Holds general commands for self bot '''
-import codecs
 import random
 import re
 
 import discord
 from discord.ext import commands
-import upsidedown
 
 __all__ = [
     'setup',
