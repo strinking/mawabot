@@ -127,7 +127,7 @@ class Info:
             name = f'{user.name}#{user.discriminator}'
             embed.set_author(name=name)
             embed.set_thumbnail(url=user.avatar_url)
-            embed.add_field(name='Status:', value=user.status)
+            embed.add_field(name='Status:', value=f'`{user.status}`')
             embed.add_field(name='ID:', value=f'`{user.id}`')
             await ctx.send(embed=embed)
 
