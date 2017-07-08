@@ -127,6 +127,18 @@ class Messages:
                     break
         await ctx.message.delete()
 
+    @commands.command()
+    async def purge(self, ctx, posts: int = 1):
+        ''' Deletes the last X posts in the channel, not including the trigger. '''
+
+        if posts > MAX_DELETE_POSTS:
+            logger.error((f'Asked to delete {posts} posts which is greater than '
+                          f'the self-imposed limit of {MAX_DELETE_POSTS}'))
+            return
+
+        async for msg in ctx.channel.history(limit=posts + 1):
+            await msg.delete()
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = Messages(bot)
