@@ -14,6 +14,8 @@
 import random
 import re
 
+from .. import calc
+
 import discord
 from discord.ext import commands
 
@@ -67,6 +69,25 @@ class General:
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
     @commands.command()
+
+    async def calc(self, ctx, *, expr: str):
+        ''' Evaluates a mathematical expression and prints the result '''
+
+        fut = ctx.message.delete()
+        embed = discord.Embed(type='rich')
+        embed.set_author(name=expr)
+
+        try:
+            result = calc.parser.parse(expr)
+            embed.description = f'= {result}'
+            embed.color = discord.Color.teal()
+        except:
+            embed.description = 'Error parsing expression'
+            embed.color = discord.Color.red()
+
+        await ctx.send(embed=embed)
+        await fut
+
     @commands.guild_only()
     async def nick(self, ctx, *, nickname: str):
         ''' Changes the users nickname '''
