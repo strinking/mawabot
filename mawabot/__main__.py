@@ -62,14 +62,14 @@ if __name__ == '__main__':
     if args.dis_debug:
         dis_logger = logging.getLogger('discord')
         dis_logger.setLevel(level=log_level)
-        dis_logger.addHandler(log_hndl)
+        dis_logger.addHandler(logging.INFO)
 
     if args.stdout:
         log_hndl = logging.StreamHandler(sys.stdout)
         log_hndl.setFormatter(log_fmtr)
         logger.addHandler(log_hndl)
         if args.dis_debug:
-            dis_logger.addHandler(log_hndl)
+            dis_logger.addHandler(logging.INFO)
 
     try:
         # Load config
