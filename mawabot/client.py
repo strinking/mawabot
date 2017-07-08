@@ -17,18 +17,12 @@ Holds the custom discord client
 
 import datetime
 import logging
+from os import listdir
 
 import discord
 from discord.ext import commands
 
-COGS = [
-    'mawabot.cogs.general',
-    'mawabot.cogs.guild',
-    'mawabot.cogs.info',
-    'mawabot.cogs.messages',
-    'mawabot.cogs.programming',
-    'mawabot.cogs.text',
-]
+from .utils import Reloader
 
 logger = logging.getLogger(__name__)
 
@@ -78,9 +72,22 @@ class Bot(commands.Bot):
         else:
             self.output_chan = self.get_channel(int(self.config['output-channel']))
 
-        for cog in COGS:
-            self.load_extension(cog)
-            logger.info(f'Loaded cog: {cog}')
+        self.add_cog(Reloader(self))
+        logger.info('Loaded cog: Reloader')
+
+        files = [file.replace('.py', '') for file in listdir(f'mawabot/cogs')
+                 if ".py" in file]
+
+        for file in files:
+            try:
+                self.load_extension(f'mawabot.cogs.{file}')
+            except Exception as error:
+                # Something made the loading fail
+                # So log it with reason and tell user to check it
+                logger.exception('Loading failed', exc_info=error)
+                continue
+            else:
+                logger.info(f'Loaded cog: {file}')
 
         channels = sum(1 for _ in self.get_all_channels())
         logger.info(f'Logged in as {self.user.name} ({self.user.id})')
