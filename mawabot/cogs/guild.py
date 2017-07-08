@@ -68,12 +68,13 @@ class Guild:
         role_count = len(ctx.guild.roles)
         emoji_count = len(ctx.guild.emojis)
         created = ctx.guild.created_at.strftime('%x @ %X')
+        online = sum(1 for member in ctx.guild.members if member.status == online)
 
         text = '\n'.join((
             f'Created: `{created}`',
             f'Text Channels: `{text_count}`',
             f'Voice Channels: `{voice_count}`',
-            f'Members: `{ctx.guild.member_count}`',
+            f'Members: `{online} / {ctx.guild.member_count}`',
             f'Roles: `{role_count}`',
             f'Emojis: `{emoji_count}`',
         ))
