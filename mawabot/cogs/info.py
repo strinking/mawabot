@@ -17,6 +17,8 @@ import unicodedata
 import discord
 from discord.ext import commands
 
+from mawabot import __version__ as version
+
 __all__ = [
     'setup',
 ]
@@ -160,6 +162,25 @@ class Info:
 
         uptime = str(self.bot.uptime).split('.')[0]
         await ctx.message.edit(content=f'`{uptime}`')
+
+    @commands.command()
+    async def stats(self, ctx):
+        ''' Gets bot stats '''
+
+        title = f'mawabot v{version}'
+        url = 'https://github.com/Ma-wa-re/mawabot'
+
+        uptime = str(self.bot.uptime).split('.')[0]
+        channels = sum(1 for _ in self.bot.get_all_channels())
+        desc = [f'Uptime: `{uptime}`',
+                '\n',
+                f'Guilds: `{len(self.bot.guilds)}`',
+                f'Channels: `{channels}`',
+                f'Users: `{len(self.bot.users)}`',
+                '\n',]
+        
+        embed = discord.Embed(title=title, url=url, description='\n'.join(desc))
+        await ctx.send(embed=embed)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
