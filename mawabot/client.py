@@ -17,6 +17,7 @@ Holds the custom discord client
 
 import datetime
 import logging
+import re
 from os import listdir
 
 import discord
@@ -25,6 +26,8 @@ from discord.ext import commands
 from .utils import Reloader
 
 logger = logging.getLogger(__name__)
+
+PY_FILE_REGEX = re.compile(r'\.py', re.IGNORECASE)
 
 class Bot(commands.Bot):
     ''' The custom discord ext bot '''
@@ -75,9 +78,8 @@ class Bot(commands.Bot):
         self.add_cog(Reloader(self))
         logger.info('Loaded cog: Reloader')
 
-        files = [file.replace('.py', '') for file in listdir(f'mawabot/cogs')
-                 if ".py" in file]
-        
+        files = [PY_FILE_REGEX.sub('', file) for file in listdir('mawabot/cogs') if '.py' in file]
+
         logger.debug(f'Files found: {files}')
 
         for file in files:

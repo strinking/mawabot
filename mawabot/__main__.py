@@ -38,7 +38,7 @@ if __name__ == '__main__':
             dest='debug', action='store_true',
             help="Set logging level to debug for the selfbot.")
     argparser.add_argument('-D', '--discord',
-            dest='dis_debug', action='store_true',
+            dest='dis_log', action='store_true',
             help="Adds the Discord logger to the log file.")
     argparser.add_argument('config_file',
             help="Specify a configuration file to use. Keep it secret!")
@@ -50,26 +50,23 @@ if __name__ == '__main__':
                                    encoding='utf-8', mode=LOG_FILE_MODE)
     log_hndl.setFormatter(log_fmtr)
 
-    if args.debug:
-        log_level = logging.DEBUG
-    else:
-        log_level = logging.INFO
+    log_level = logging.DEBUG if args.debug else logging.INFO
 
     logger = logging.getLogger(__package__)
     logger.setLevel(level=log_level)
     logger.addHandler(log_hndl)
 
-    if args.dis_debug:
+    if args.dis_log:
         dis_logger = logging.getLogger('discord')
-        dis_logger.setLevel(level=log_level)
-        dis_logger.addHandler(logging.INFO)
+        dis_logger.setLevel(level=logging.INFO)
+        dis_logger.addHandler(log_hndl)
 
     if args.stdout:
         log_hndl = logging.StreamHandler(sys.stdout)
         log_hndl.setFormatter(log_fmtr)
         logger.addHandler(log_hndl)
-        if args.dis_debug:
-            dis_logger.addHandler(logging.INFO)
+        if args.dis_log:
+            dis_logger.addHandler(log_hndl)
 
     try:
         # Load config

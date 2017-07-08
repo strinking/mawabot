@@ -17,19 +17,21 @@ from discord.ext import commands
 
 logger = logging.getLogger(__name__)
 
+COGS_DIR = 'mawabot.cogs.'
+
 class Reloader:
 
     def __init__(self, bot):
         self.bot = bot
 
     def load_cog(self, cogname):
-        if 'mawabot.cogs.' not in cogname:
-            cogname = f'mawabot.cogs.{cogname}'
+        if COGS_DIR not in cogname:
+            cogname = f'{COGS_DIR}{cogname}'
         self.bot.load_extension(cogname)
 
     def unload_cog(self, cogname):
-        if 'mawabot.cogs.' not in cogname:
-            cogname = f'mawabot.cogs.{cogname}'
+        if COGS_DIR not in cogname:
+            cogname = f'{COGS_DIR}{cogname}'
         self.bot.unload_extension(cogname)
 
     @commands.command()
