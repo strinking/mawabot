@@ -77,6 +77,8 @@ class Bot(commands.Bot):
 
         files = [file.replace('.py', '') for file in listdir(f'mawabot/cogs')
                  if ".py" in file]
+        
+        logger.debug(f'Files found: {files}')
 
         for file in files:
             try:
@@ -84,7 +86,7 @@ class Bot(commands.Bot):
             except Exception as error:
                 # Something made the loading fail
                 # So log it with reason and tell user to check it
-                logger.exception('Loading failed', exc_info=error)
+                logger.debug(f'Load failed: {file}', exc_info=error)
                 continue
             else:
                 logger.info(f'Loaded cog: {file}')

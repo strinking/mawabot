@@ -42,7 +42,8 @@ class Reloader:
         try:
             self.load_cog(cogname)
         except Exception as error:
-            logger.exception('Loading failed', exc_info=error)
+            logger.error('Load failed')
+            logger.debug('Reason:', exc_info=error)
             embed = discord.Embed(color=discord.Color.red(), description=f'```{error}```')
             embed.set_author(name='Load failed')
             await ctx.send(embed=embed)
@@ -62,7 +63,8 @@ class Reloader:
         try:
             self.unload_cog(cogname)
         except Exception as error:
-            logger.exception('Unload failed', exc_info=error)
+            logger.error('Unload failed')
+            logger.debug('Reason:', exc_info=error)
             embed = discord.Embed(color=discord.Color.red(), description=f'```{error}```')
             embed.set_author(name='Unload failed')
             await ctx.send(embed=embed)
@@ -83,7 +85,8 @@ class Reloader:
             self.unload_cog(cogname)
             self.load_cog(cogname)
         except Exception as error:
-            logger.exception('Reload failed', exc_info=error)
+            logger.error('Reload failed')
+            logger.debug('Reason:', exc_info=error)
             embed = discord.Embed(color=discord.Color.red(), description=f'```{error}```')
             embed.set_author(name='Reload failed')
             await ctx.send(embed=embed)
