@@ -67,7 +67,7 @@ class Messages:
     async def quote(self, ctx, id: int, cid: int = 0):
         ''' Quotes the given post(s) '''
 
-        await ctx.message.delete()
+        fut = ctx.message.delete()
         if cid:
             channel = self.bot.get_channel(cid)
             if channel is None:
@@ -75,6 +75,7 @@ class Messages:
                 return
         else:
             channel = ctx.channel
+        await fut
 
         to_quote = await self._get_messages(channel, (id,))
         for msg in to_quote:
@@ -118,14 +119,16 @@ class Messages:
                           f'the self-imposed limit of {MAX_DELETE_POSTS}'))
             return
 
+        fut = ctx.message.delete()
         deleted = 0
         async for msg in ctx.channel.history():
             if msg.author == self.bot.user:
                 await msg.delete()
                 deleted += 1
-                if deleted >= posts:
+                if deleted >= posts + 1:
                     break
-        await ctx.message.delete()
+
+        await fut
 
     @commands.command()
     async def purge(self, ctx, posts: int = 1):
@@ -137,7 +140,10 @@ class Messages:
             return
 
         async for msg in ctx.channel.history(limit=posts + 1):
-            await msg.delete()
+            try:
+                await msg.delete()
+            except discord.errors.DiscordException as ex:
+                logger.error(f'Cannot delete message {msg.id}: {ex}')
 
 def setup(bot):
     ''' Setup function to add cog to bot '''

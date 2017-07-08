@@ -38,7 +38,7 @@ class Text:
         async for msg in ctx.channel.history():
             if msg.author != self.bot.client:
                 count += 1
-                if count >= posts_back:
+                if count >= posts_back + 1:
                     break
 
         assert msg.author == self.bot.client
