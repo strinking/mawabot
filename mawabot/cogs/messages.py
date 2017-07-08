@@ -111,11 +111,12 @@ class Messages:
 
     @commands.command()
     async def delet(self, ctx, posts: int = 1):
-        ''' Deletes the last X posts, including the trigger '''
+        ''' Deletes the last X posts you made, including the trigger '''
 
         if posts > MAX_DELETE_POSTS:
             logger.error((f'Asked to delete {posts} posts which is greater than '
                           f'the self-imposed limit of {MAX_DELETE_POSTS}'))
+            return
 
         deleted = 0
         async for msg in ctx.channel.history():
