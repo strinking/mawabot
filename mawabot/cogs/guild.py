@@ -68,13 +68,15 @@ class Guild:
         role_count = len(ctx.guild.roles)
         emoji_count = len(ctx.guild.emojis)
         created = ctx.guild.created_at.strftime('%x @ %X')
-        online = sum(1 for member in ctx.guild.members if member.status == online)
+        members_online = sum(1 for member in ctx.guild.members if member.status != discord.Status.offline)
+        members_total = ctx.guild.member_count
+        members_percent = members_online / members_total * 100
 
         text = '\n'.join((
             f'Created: `{created}`',
             f'Text Channels: `{text_count}`',
             f'Voice Channels: `{voice_count}`',
-            f'Members: `{online} / {ctx.guild.member_count}`',
+            f'Members: `{members_online} / {members_total} ({members_percent:.1f}% online)`',
             f'Roles: `{role_count}`',
             f'Emojis: `{emoji_count}`',
         ))
