@@ -13,6 +13,8 @@
 ''' Has several commands that get guild information '''
 import re
 import unicodedata
+import aiohttp
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -24,6 +26,7 @@ __all__ = [
 ]
 
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
+GIT_REPO_CONTRIBUTORS = 'https://api.github.com/repos/Ma-wa-re/mawabot/stats/contributors'
 
 class Info:
     __slots__ = (
@@ -76,6 +79,21 @@ class Info:
                 if member:
                     members.append(member)
         return members
+
+    async def get_git_contributors(self):
+        
+        while True:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(GIT_REPO_CONTRIBUTORS) as resp:
+                    status = resp.status
+                    data = await resp.json()
+                
+            if status == 200:
+                return data
+            elif status == 202:
+                await asyncio.sleep(10)
+            else:
+                return []
 
     # Commands
     @commands.command()
@@ -167,7 +185,7 @@ class Info:
     async def stats(self, ctx):
         ''' Gets bot stats '''
 
-        title = f'mawabot v{version}'
+        title = 'mawabot'
         url = 'https://github.com/Ma-wa-re/mawabot'
 
         uptime = str(self.bot.uptime).split('.')[0]
@@ -176,10 +194,18 @@ class Info:
                 '\n',
                 f'Guilds: `{len(self.bot.guilds)}`',
                 f'Channels: `{channels}`',
-                f'Users: `{len(self.bot.users)}`',
-                '\n',]
-        
+                f'Users: `{len(self.bot.users)}`',]
+
         embed = discord.Embed(title=title, url=url, description='\n'.join(desc))
+        git = []
+        contributors = await self.get_git_contributors()
+
+        if contributors:
+            for user in contributors:
+                author = user['author']
+                git.append(f'[{author["login"]}]({author["html_url"]}) ({user["total"]})')
+        
+        embed.add_field(name='Git Info', value=f'Version: `{version}`\n{", ".join(git)}')
         await ctx.send(embed=embed)
 
 def setup(bot):
