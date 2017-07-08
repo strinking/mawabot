@@ -132,6 +132,40 @@ class Info:
             await ctx.send(embed=embed)
 
     @commands.command()
+    async def id(self, ctx, *ids: int):
+        ''' Gets information about the given snowflakes '''
+
+        for id in ids:
+            embed = discord.Embed(type='rich')
+            embed.set_author(name=f'Snowflake {id}')
+            embed.timestamp = discord.utils.snowflake_time(id)
+
+            guild = self.bot.get_guild(id)
+            if guild:
+                embed.add_field(name='Guild:', value=guild.name)
+                embed.set_thumbnail(url=guild.icon_url)
+
+            channel = self.bot.get_channel(id)
+            if channel:
+                text = channel.mention
+                if channel.guild != guild:
+                    text += f' from "{channel.guild.name}"'
+                embed.add_field(name='Channel:', value=text)
+
+            user = self.bot.get_user(id)
+            if user:
+                embed.add_field(name='User:', value=user.mention)
+
+            emoji = self.bot.get_emoji(id)
+            if emoji:
+                text = f'{emoji} ({emoji.name}) from "{channel.guild.name}"'
+                embed.add_field(name='Emoji:', value=text)
+
+            # Can't do get_message() since we're not a true bot
+
+            await ctx.send(embed=embed)
+
+    @commands.command()
     async def emoji(self, ctx, *emojis: str):
         ''' Gets information about the given emoji(s) '''
 
