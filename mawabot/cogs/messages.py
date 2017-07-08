@@ -86,7 +86,6 @@ class Messages:
             if msg.attachments:
                 urls = '\n'.join(attach.url for attach in msg.attachments)
                 embed.add_field(name='Attachments:', value=urls)
-
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -108,6 +107,10 @@ class Messages:
             embed = discord.Embed(type='rich', description=content)
             embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
             embed.timestamp = msg.created_at
+
+            if msg.attachments:
+                urls = '\n'.join(attach.url for attach in msg.attachments)
+                embed.add_field(name='Attachments:', value=urls)
             await self.bot._send(embed=embed)
 
             for embed in msg.embeds:
