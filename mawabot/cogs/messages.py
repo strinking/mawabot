@@ -117,8 +117,13 @@ class Messages:
             logger.error((f'Asked to delete {posts} posts which is greater than '
                           f'the self-imposed limit of {MAX_DELETE_POSTS}'))
 
-        async for msg in ctx.channel.history(limit=posts + 1):
-            await msg.delete()
+        deleted = 0
+        async for msg in ctx.channel.history():
+            if msg.author == self.bot.user:
+                await msg.delete()
+                deleted += 1
+                if deleted >= posts:
+                    break
         await ctx.message.delete()
 
 def setup(bot):
