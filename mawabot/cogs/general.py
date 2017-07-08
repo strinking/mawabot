@@ -69,7 +69,6 @@ class General:
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
     @commands.command()
-
     async def calc(self, ctx, *, expr: str):
         ''' Evaluates a mathematical expression and prints the result '''
 
@@ -88,10 +87,23 @@ class General:
         await ctx.send(embed=embed)
         await fut
 
+    @commands.command()
     @commands.guild_only()
-    async def nick(self, ctx, *, nickname: str):
-        ''' Changes the users nickname '''
-        await ctx.guild.get_member(self.bot.user.id).edit(nick=nickname)
+    async def nick(self, ctx, *, nickname: str = None):
+        ''' Changes the user's nickname '''
+
+        await ctx.guild.me.edit(nick=nickname)
+
+    @commands.command()
+    async def playing(self, ctx, *, playing: str = None):
+        ''' Changes the user's current game '''
+
+        if playing:
+            game = discord.Game(name=playing)
+        else:
+            game = None
+
+        await self.bot.change_presence(game=game)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
