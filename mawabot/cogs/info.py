@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
-GIT_REPO_CONTRIBUTORS = 'https://api.github.com/repos/Ma-wa-re/mawabot/stats/contributors'
+GIT_REPO_CONTRIBUTORS = 'https://api.github.com/repos/strinking/mawabot/stats/contributors'
 
 class Info:
     __slots__ = (
@@ -188,7 +188,7 @@ class Info:
         ''' Gets bot stats '''
 
         title = 'mawabot'
-        url = 'https://github.com/Ma-wa-re/mawabot'
+        url = 'https://github.com/strinking/mawabot'
 
         uptime = str(self.bot.uptime).split('.')[0]
         channels = sum(1 for _ in self.bot.get_all_channels())
