@@ -87,15 +87,16 @@ class Info:
 
         for user in users:
             profile = None
-            if not user.bot:
+            if not user.bot and not isinstance(user, discord.ClientUser):
                 # Get user profile info
                 profile = await user.profile()
 
             lines = [user.mention]
 
-            if profile.premium:
-                since = profile.premium_since.strftime('%x @ %X')
-                lines.append(f'Nitro user since `{since}`')
+            if profile is not None:
+                if profile.premium:
+                    since = profile.premium_since.strftime('%x @ %X')
+                    lines.append(f'Nitro user since `{since}`')
 
             if isinstance(user, discord.Member):
                 if user.game:
@@ -136,7 +137,8 @@ class Info:
             name = f'{user.name}#{user.discriminator}'
             embed.set_author(name=name)
             embed.set_thumbnail(url=user.avatar_url)
-            embed.add_field(name='Status:', value=f'`{user.status}`')
+            if isinstance(user, discord.Member):
+                embed.add_field(name='Status:', value=f'`{user.status}`')
             embed.add_field(name='ID:', value=f'`{user.id}`')
 
             # Get connected accounts
