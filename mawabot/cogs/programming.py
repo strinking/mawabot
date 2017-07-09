@@ -41,13 +41,14 @@ class Programming:
             embed.set_author(name=command)
             await ctx.send(embed=embed)
 
+    @commands.command()
     async def eval(self, ctx, *, expr: str):
         ''' Evaluates an abritrary Python expression '''
 
         logger.info(f'Evaluating python: "{expr}"')
-        result = eval(command)
+        result = eval(expr)
         embed = discord.Embed(type='rich', description=repr(result))
-        embed.set_author(name=command)
+        embed.set_author(name=expr)
         await ctx.send(embed=embed)
 
 def setup(bot):
