@@ -11,13 +11,13 @@
 #
 
 ''' Holds general commands for self bot '''
-import codecs
 import random
 import re
 
+from .. import calc
+
 import discord
 from discord.ext import commands
-import upsidedown
 
 __all__ = [
     'setup',
@@ -67,6 +67,43 @@ class General:
 
             rolls = ' + '.join(rolls)
             await ctx.send(content=f'🎲 {rolls} = {total}')
+
+    @commands.command()
+    async def calc(self, ctx, *, expr: str):
+        ''' Evaluates a mathematical expression and prints the result '''
+
+        fut = ctx.message.delete()
+        embed = discord.Embed(type='rich')
+        embed.set_author(name=expr)
+
+        try:
+            result = calc.parser.parse(expr)
+            embed.description = f'= {result}'
+            embed.color = discord.Color.teal()
+        except:
+            embed.description = 'Error parsing expression'
+            embed.color = discord.Color.red()
+
+        await ctx.send(embed=embed)
+        await fut
+
+    @commands.command()
+    @commands.guild_only()
+    async def nick(self, ctx, *, nickname: str = None):
+        ''' Changes the user's nickname '''
+
+        await ctx.guild.me.edit(nick=nickname)
+
+    @commands.command()
+    async def playing(self, ctx, *, playing: str = None):
+        ''' Changes the user's current game '''
+
+        if playing:
+            game = discord.Game(name=playing)
+        else:
+            game = None
+
+        await self.bot.change_presence(game=game)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''

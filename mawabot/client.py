@@ -16,18 +16,18 @@ Holds the custom discord client
 '''
 
 import datetime
+import logging
+import re
+from os import listdir
 
 import discord
 from discord.ext import commands
 
-COGS = [
-    'mawabot.cogs.general',
-    'mawabot.cogs.guild',
-    'mawabot.cogs.info',
-    'mawabot.cogs.messages',
-    'mawabot.cogs.text',
-]
+from .utils import Reloader
 
+logger = logging.getLogger(__name__)
+
+PY_FILE_REGEX = re.compile(r'\.py$', re.IGNORECASE)
 
 class Bot(commands.Bot):
     ''' The custom discord ext bot '''
@@ -39,9 +39,8 @@ class Bot(commands.Bot):
         'output_chan',
     )
 
-    def __init__(self, config, logger):
+    def __init__(self, config):
         self.config = config
-        self.logger = logger
         self.start_time = datetime.datetime.utcnow()
         self.output_chan = None
         super().__init__(command_prefix=config['prefix'],
@@ -61,7 +60,7 @@ class Bot(commands.Bot):
 
         if not self.config['token']:
             err_msg = 'Token is empty. Please open the config file and add your token!'
-            self.logger.critical(err_msg)
+            logger.critical(err_msg)
         else:
             return super().run(self.config['token'], bot=False)
 
@@ -72,28 +71,42 @@ class Bot(commands.Bot):
         '''
 
         if self.config['output-channel'] is None:
-            self.logger.warn('No output channel set in config.')
+            logger.warn('No output channel set in config.')
         else:
             self.output_chan = self.get_channel(int(self.config['output-channel']))
 
-        for cog in COGS:
-            self.load_extension(cog)
-            self.logger.info(f'Loaded cog: {cog}')
+        self.add_cog(Reloader(self))
+        logger.info('Loaded cog: Reloader')
+
+        files = [PY_FILE_REGEX.sub('', file) for file in listdir('mawabot/cogs') if '.py' in file]
+
+        logger.debug(f'Files found: {files}')
+
+        for file in files:
+            try:
+                self.load_extension(f'mawabot.cogs.{file}')
+            except Exception as error:
+                # Something made the loading fail
+                # So log it with reason and tell user to check it
+                logger.debug(f'Load failed: {file}', exc_info=error)
+                continue
+            else:
+                logger.info(f'Loaded cog: {file}')
 
         channels = sum(1 for _ in self.get_all_channels())
-        self.logger.info(f'Logged in as {self.user.name} ({self.user.id})')
-        self.logger.info('Connected to:')
-        self.logger.info(f'* {len(self.guilds)} guilds')
-        self.logger.info(f'* {channels} channels')
-        self.logger.info(f'* {len(self.users)} users')
-        self.logger.info('------')
-        self.logger.info('Ready!')
+        logger.info(f'Logged in as {self.user.name} ({self.user.id})')
+        logger.info('Connected to:')
+        logger.info(f'* {len(self.guilds)} guilds')
+        logger.info(f'* {channels} channels')
+        logger.info(f'* {len(self.users)} users')
+        logger.info('------')
+        logger.info('Ready!')
 
         await self.change_presence(status=discord.Status.invisible)
-        self.logger.info('Setting status to invisible')
+        logger.info('Setting status to invisible')
 
     async def _send(self, *args, **kwargs):
         if self.output_chan is None:
-            self.logger.warn('No output channel set!')
+            logger.warn('No output channel set!')
         else:
             await self.output_chan.send(*args, **kwargs)

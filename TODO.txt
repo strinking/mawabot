@@ -1,3 +1,0 @@
-.playing [game]
-.nick [new-nickname]
-
