@@ -32,14 +32,37 @@ class Programming:
 
     @commands.command()
     async def exec(self, ctx, *, command: str):
-        ''' Allows arbitrary execution of Python code '''
+        ''' Evaluates an arbitrary Python command '''
 
         logger.info(f'Running python: "{command}"')
-        result = eval(command)
-        if result is not None:
-            embed = discord.Embed(type='rich', description=repr(result))
-            embed.set_author(name=command)
+        embed = discord.Embed(type='rich')
+        embed.set_author(name=command)
+        try:
+            exec(command)
+            embed.color = discord.Color.green()
+            embed.description = 'Success'
             await ctx.send(embed=embed)
+        except Exception as ex:
+            embed.color = discord.Color.red()
+            embed.description = f'{ex.__class__.__name__}: {ex}'
+            await ctx.send(embed=embed)
+
+    @commands.command()
+    async def eval(self, ctx, *, expr: str):
+        ''' Evaluates an abritrary Python expression '''
+
+        logger.info(f'Evaluating python: "{expr}"')
+        embed = discord.Embed(type='rich')
+        embed.set_author(name=expr)
+        try:
+            result = eval(expr)
+            embed.color = discord.Color.teal()
+            embed.description = repr(result)
+        except Exception as ex:
+            embed.color = discord.Color.red()
+            embed.description = f'{ex.__class__.__name__}: {ex}'
+
+        await ctx.send(embed=embed)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
