@@ -69,29 +69,48 @@ class General:
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
     @commands.command()
-
-    async def calc(self, ctx, *, expr: str):
+    async def calc(self, ctx, *, expr: str = '(nothing)'):
         ''' Evaluates a mathematical expression and prints the result '''
 
         fut = ctx.message.delete()
         embed = discord.Embed(type='rich')
-        embed.set_author(name=expr)
+        embed.set_author(name='Calculator:')
+        lines = [
+            '**Input:**',
+            expr,
+            '',
+            '**Output:**',
+        ]
 
         try:
             result = calc.parser.parse(expr)
-            embed.description = f'= {result}'
+            lines.append(str(result))
             embed.color = discord.Color.teal()
         except:
-            embed.description = 'Error parsing expression'
+            lines.append('Error parsing expression')
             embed.color = discord.Color.red()
 
+        embed.description = '\n'.join(lines)
         await ctx.send(embed=embed)
         await fut
 
+    @commands.command()
     @commands.guild_only()
-    async def nick(self, ctx, *, nickname: str):
-        ''' Changes the users nickname '''
-        await ctx.guild.get_member(self.bot.user.id).edit(nick=nickname)
+    async def nick(self, ctx, *, nickname: str = None):
+        ''' Changes the user's nickname '''
+
+        await ctx.guild.me.edit(nick=nickname)
+
+    @commands.command()
+    async def playing(self, ctx, *, playing: str = None):
+        ''' Changes the user's current game '''
+
+        if playing:
+            game = discord.Game(name=playing)
+        else:
+            game = None
+
+        await self.bot.change_presence(game=game)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''

@@ -34,9 +34,14 @@ class Text:
         ''' Adds a separator between posts, X posts back '''
 
         fut = ctx.message.delete()
-        async for msg in ctx.channel.history(limit=posts_back + 1):
-            pass
+        count = 0
+        async for msg in ctx.channel.history():
+            if msg.author != self.bot.client:
+                count += 1
+                if count >= posts_back + 1:
+                    break
 
+        assert msg.author == self.bot.client
         if not msg.content.startswith('.\n'):
             content = '.\n' + msg.content
             await msg.edit(content=content)

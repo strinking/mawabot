@@ -113,12 +113,22 @@ class Info:
             users = self._get_members(ctx.guild, names)
 
         for user in users:
+            profile = None
+            if not user.bot and not isinstance(user, discord.ClientUser):
+                # Get user profile info
+                profile = await user.profile()
+
             lines = [user.mention]
+
+            if profile is not None:
+                if profile.premium:
+                    since = profile.premium_since.strftime('%x @ %X')
+                    lines.append(f'Nitro user since `{since}`')
 
             if isinstance(user, discord.Member):
                 if user.game:
                     if user.game.type == 1:
-                        lines.append(f'Streaming `{user.game.url}`')
+                        lines.append(f'Streaming [{user.game.name}]({user.game.url})')
                     else:
                         lines.append(f'Playing `{user.game.name}`')
 
@@ -154,8 +164,60 @@ class Info:
             name = f'{user.name}#{user.discriminator}'
             embed.set_author(name=name)
             embed.set_thumbnail(url=user.avatar_url)
-            embed.add_field(name='Status:', value=f'`{user.status}`')
+            if isinstance(user, discord.Member):
+                embed.add_field(name='Status:', value=f'`{user.status}`')
             embed.add_field(name='ID:', value=f'`{user.id}`')
+
+            # Get connected accounts
+            if profile is not None:
+                if profile.connected_accounts:
+                    accounts = []
+
+                    for account in profile.connected_accounts:
+                        if account['type'] == 'steam':
+                            url = f'https://steamcommunity.com/profiles/{account["id"]}'
+                            accounts.append(f'[{account["name"]}]({url})')
+                        elif account['type'] == 'twitch':
+                            url = f'https://www.twitch.tv/{account["name"]}'
+                            accounts.append(f'[{account["name"]}]({url})')
+
+                    if accounts:
+                        embed.add_field(name='Connected Accounts:', value=', '.join(accounts))
+
+            await ctx.send(embed=embed)
+
+    @commands.command()
+    async def id(self, ctx, *ids: int):
+        ''' Gets information about the given snowflakes '''
+
+        for id in ids:
+            embed = discord.Embed(type='rich')
+            embed.set_author(name=f'Snowflake {id}')
+            embed.timestamp = discord.utils.snowflake_time(id)
+
+            guild = self.bot.get_guild(id)
+            if guild:
+                embed.add_field(name='Guild:', value=guild.name)
+                embed.set_thumbnail(url=guild.icon_url)
+
+            channel = self.bot.get_channel(id)
+            if channel:
+                text = channel.mention
+                if channel.guild != guild:
+                    text += f' from "{channel.guild.name}"'
+                embed.add_field(name='Channel:', value=text)
+
+            user = self.bot.get_user(id)
+            if user:
+                embed.add_field(name='User:', value=user.mention)
+
+            emoji = self.bot.get_emoji(id)
+            if emoji:
+                text = f'{emoji} ({emoji.name}) from "{channel.guild.name}"'
+                embed.add_field(name='Emoji:', value=text)
+
+            # Can't do get_message() since we're not a true bot
+
             await ctx.send(embed=embed)
 
     @commands.command()
