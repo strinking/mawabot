@@ -11,6 +11,7 @@
 #
 
 ''' Holds general commands for self bot '''
+import math
 import random
 import re
 
@@ -24,6 +25,7 @@ __all__ = [
 ]
 
 DICE_REGEX = re.compile(r'(?:([0-9]+)?\s*d)?\s*([0-9]+)', re.IGNORECASE)
+MATH_LOCALS = {name: getattr(math, name) for name in dir(math) if not name.startswith('_')}
 
 class General:
     __slots__ = (
@@ -83,7 +85,7 @@ class General:
         ]
 
         try:
-            result = calc.parser.parse(expr)
+            result = eval(expr, MATH_LOCALS)
             lines.append(str(result))
             embed.color = discord.Color.teal()
         except:
