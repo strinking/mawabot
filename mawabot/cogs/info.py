@@ -11,15 +11,15 @@
 #
 
 ''' Has several commands that get guild information '''
-import re
-import unicodedata
-import aiohttp
 import asyncio
 import os
+import re
+import unicodedata
 
+import aiohttp
 import discord
-from discord.ext import commands
 import psutil
+from discord.ext import commands
 
 from mawabot import __version__ as version
 
@@ -28,7 +28,12 @@ __all__ = [
 ]
 
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
-GIT_REPO_CONTRIBUTORS = 'https://api.github.com/repos/strinking/mawabot/stats/contributors'
+
+REPO = 'strinking/mawabot'
+GIT_CONTRIBUTORS = f'https://api.github.com/repos/{REPO}/stats/contributors'
+GITHUB_URL = f'https://github.com/{REPO}'
+
+MiB = 1024 * 1024
 
 class Info:
     __slots__ = (
@@ -83,17 +88,17 @@ class Info:
         return members
 
     async def get_git_contributors(self):
-        
+
         while True:
             async with aiohttp.ClientSession() as session:
-                async with session.get(GIT_REPO_CONTRIBUTORS) as resp:
+                async with session.get(GIT_CONTRIBUTORS) as resp:
                     status = resp.status
                     data = await resp.json()
-                
+
             if status == 200:
                 return data
             elif status == 202:
-                await asyncio.sleep(10)
+                await asyncio.sleep(2)
             else:
                 return []
 
@@ -187,9 +192,6 @@ class Info:
     async def stats(self, ctx):
         ''' Gets bot stats '''
 
-        title = 'mawabot'
-        url = 'https://github.com/strinking/mawabot'
-
         uptime = str(self.bot.uptime).split('.')[0]
         channels = sum(1 for _ in self.bot.get_all_channels())
         desc = [f'Uptime: `{uptime}`',
@@ -197,7 +199,7 @@ class Info:
                 f'Channels: `{channels}`',
                 f'Users: `{len(self.bot.users)}`',]
 
-        embed = discord.Embed(title=title, url=url, description='\n'.join(desc))
+        embed = discord.Embed(title='mawabot', url=GITHUB_URL, description='\n'.join(desc))
         git = []
         contributors = await self.get_git_contributors()
 
@@ -214,9 +216,9 @@ class Info:
         py = psutil.Process(pid)
 
         cpu = py.cpu_percent()
-        mem = py.memory_info()[0]/1000/1000
+        mem = py.memory_info()[0] / MiB
 
-        embed.add_field(name='System Info', value=f'CPU: `{cpu}%` Mem: `{mem:.2f} MB`', inline=False)
+        embed.add_field(name='System Info', value=f'CPU: `{cpu}%` Mem: `{mem:.2f} MiB`', inline=False)
 
         await ctx.send(embed=embed)
 
