@@ -77,17 +77,20 @@ class General:
         embed.set_author(name='Calculator:')
         lines = [
             '**Input:**',
-            expr,
+            expr.replace('*', r'\*'),
             '',
             '**Output:**',
         ]
 
         try:
             result = eval(expr, MATH_LOCALS)
-            lines.append(str(result))
+            if type(result) == float:
+                lines.append(f'{result:.4f}')
+            else:
+                lines.append(str(result))
             embed.color = discord.Color.teal()
-        except:
-            lines.append('Error parsing expression')
+        except Exception as ex:
+            lines.append(f'Error: {ex}')
             embed.color = discord.Color.red()
 
         embed.description = '\n'.join(lines)
