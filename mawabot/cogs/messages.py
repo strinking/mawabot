@@ -11,7 +11,7 @@
 #
 
 ''' Has several commands that deal with messages '''
-
+import asyncio
 import logging
 
 import discord
@@ -55,6 +55,16 @@ class Messages:
         fut = ctx.message.delete()
         await ctx.send(content=content, delete_after=0)
         await fut
+
+    @commands.command()
+    async def delay(self, ctx, seconds: float, *, content: str):
+        ''' Sends the given message after the specified number of seconds '''
+
+        logger.info(f'Queued up delayed message for {seconds} seconds from now')
+        await ctx.message.delete()
+        await asyncio.sleep(seconds)
+        logger.info(f'Posting delayed message: {content}')
+        await ctx.send(content=content)
 
     @commands.command()
     async def embed(self, ctx, *, content: str):
