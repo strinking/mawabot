@@ -32,14 +32,23 @@ class Programming:
 
     @commands.command()
     async def exec(self, ctx, *, command: str):
-        ''' Allows arbitrary execution of Python code '''
+        ''' Evaluates an arbitrary Python command '''
 
         logger.info(f'Running python: "{command}"')
-        result = eval(command)
+        result = exec(command)
         if result is not None:
             embed = discord.Embed(type='rich', description=repr(result))
             embed.set_author(name=command)
             await ctx.send(embed=embed)
+
+    async def eval(self, ctx, *, expr: str):
+        ''' Evaluates an abritrary Python expression '''
+
+        logger.info(f'Evaluating python: "{expr}"')
+        result = eval(command)
+        embed = discord.Embed(type='rich', description=repr(result))
+        embed.set_author(name=command)
+        await ctx.send(embed=embed)
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
