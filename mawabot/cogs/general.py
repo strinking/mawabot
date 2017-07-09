@@ -15,8 +15,6 @@ import math
 import random
 import re
 
-from .. import calc
-
 import discord
 from discord.ext import commands
 
