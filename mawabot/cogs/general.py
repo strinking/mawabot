@@ -11,10 +11,9 @@
 #
 
 ''' Holds general commands for self bot '''
+import math
 import random
 import re
-
-from .. import calc
 
 import discord
 from discord.ext import commands
@@ -24,6 +23,7 @@ __all__ = [
 ]
 
 DICE_REGEX = re.compile(r'(?:([0-9]+)?\s*d)?\s*([0-9]+)', re.IGNORECASE)
+MATH_LOCALS = {name: getattr(math, name) for name in dir(math) if not name.startswith('_')}
 
 class General:
     __slots__ = (
@@ -77,17 +77,20 @@ class General:
         embed.set_author(name='Calculator:')
         lines = [
             '**Input:**',
-            expr,
+            expr.replace('*', r'\*'),
             '',
             '**Output:**',
         ]
 
         try:
-            result = calc.parser.parse(expr)
-            lines.append(str(result))
+            result = eval(expr, MATH_LOCALS)
+            if type(result) == float:
+                lines.append(f'{result:.4f}')
+            else:
+                lines.append(str(result))
             embed.color = discord.Color.teal()
-        except:
-            lines.append('Error parsing expression')
+        except Exception as ex:
+            lines.append(f'Error: {ex}')
             embed.color = discord.Color.red()
 
         embed.description = '\n'.join(lines)
