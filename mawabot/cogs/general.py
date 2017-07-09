@@ -69,21 +69,28 @@ class General:
             await ctx.send(content=f'🎲 {rolls} = {total}')
 
     @commands.command()
-    async def calc(self, ctx, *, expr: str):
+    async def calc(self, ctx, *, expr: str = '(nothing)'):
         ''' Evaluates a mathematical expression and prints the result '''
 
         fut = ctx.message.delete()
         embed = discord.Embed(type='rich')
-        embed.set_author(name=expr)
+        embed.set_author(name='Calculator:')
+        lines = [
+            '**Input:**',
+            expr,
+            '',
+            '**Output:**',
+        ]
 
         try:
             result = calc.parser.parse(expr)
-            embed.description = f'= {result}'
+            lines.append(str(result))
             embed.color = discord.Color.teal()
         except:
-            embed.description = 'Error parsing expression'
+            lines.append('Error parsing expression')
             embed.color = discord.Color.red()
 
+        embed.description = '\n'.join(lines)
         await ctx.send(embed=embed)
         await fut
 
