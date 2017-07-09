@@ -38,14 +38,13 @@ class Programming:
         embed = discord.Embed(type='rich')
         embed.set_author(name=command)
         try:
-            result = exec(command)
-            if result is not None:
-                embed.color = discord.Color.green()
-                embed.description = repr(result)
-                await ctx.send(embed=embed)
+            exec(command)
+            embed.color = discord.Color.green()
+            embed.description = 'Success'
+            await ctx.send(embed=embed)
         except Exception as ex:
             embed.color = discord.Color.red()
-            embed.description = str(ex)
+            embed.description = f'{ex.__class__.__name__}: {ex}'
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -61,7 +60,7 @@ class Programming:
             embed.description = repr(result)
         except Exception as ex:
             embed.color = discord.Color.red()
-            embed.description = str(ex)
+            embed.description = f'{ex.__class__.__name__}: {ex}'
 
         await ctx.send(embed=embed)
 
