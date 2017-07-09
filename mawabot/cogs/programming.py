@@ -35,10 +35,17 @@ class Programming:
         ''' Evaluates an arbitrary Python command '''
 
         logger.info(f'Running python: "{command}"')
-        result = exec(command)
-        if result is not None:
-            embed = discord.Embed(type='rich', description=repr(result))
-            embed.set_author(name=command)
+        embed = discord.Embed(type='rich')
+        embed.set_author(name=command)
+        try:
+            result = exec(command)
+            if result is not None:
+                embed.color = discord.Color.green()
+                embed.description = repr(result)
+                await ctx.send(embed=embed)
+        except Exception as ex:
+            embed.color = discord.Color.red()
+            embed.description = repr(ex)
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -46,9 +53,16 @@ class Programming:
         ''' Evaluates an abritrary Python expression '''
 
         logger.info(f'Evaluating python: "{expr}"')
-        result = eval(expr)
-        embed = discord.Embed(type='rich', description=repr(result))
+        embed = discord.Embed(type='rich')
         embed.set_author(name=expr)
+        try:
+            result = eval(expr)
+            embed.color = discord.Color.teal()
+            embed.description = repr(result)
+        except Exception as ex:
+            embed.color = discord.Color.red()
+            embed.description = repr(ex)
+
         await ctx.send(embed=embed)
 
 def setup(bot):
