@@ -45,7 +45,7 @@ class Programming:
                 await ctx.send(embed=embed)
         except Exception as ex:
             embed.color = discord.Color.red()
-            embed.description = repr(ex)
+            embed.description = str(ex)
             await ctx.send(embed=embed)
 
     @commands.command()
@@ -61,7 +61,7 @@ class Programming:
             embed.description = repr(result)
         except Exception as ex:
             embed.color = discord.Color.red()
-            embed.description = repr(ex)
+            embed.description = str(ex)
 
         await ctx.send(embed=embed)
 
