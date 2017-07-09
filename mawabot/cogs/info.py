@@ -15,9 +15,11 @@ import re
 import unicodedata
 import aiohttp
 import asyncio
+import os
 
 import discord
 from discord.ext import commands
+import psutil
 
 from mawabot import __version__ as version
 
@@ -191,7 +193,6 @@ class Info:
         uptime = str(self.bot.uptime).split('.')[0]
         channels = sum(1 for _ in self.bot.get_all_channels())
         desc = [f'Uptime: `{uptime}`',
-                '\n',
                 f'Guilds: `{len(self.bot.guilds)}`',
                 f'Channels: `{channels}`',
                 f'Users: `{len(self.bot.users)}`',]
@@ -201,11 +202,22 @@ class Info:
         contributors = await self.get_git_contributors()
 
         if contributors:
+            contributors = sorted(contributors, key=lambda x: x.get('total'), reverse=True)
             for user in contributors:
                 author = user['author']
                 git.append(f'[{author["login"]}]({author["html_url"]}) ({user["total"]})')
-        
-        embed.add_field(name='Git Info', value=f'Version: `{version}`\n{", ".join(git)}')
+
+        embed.add_field(name='Repo Info', value=f'Version: `{version}`\n{", ".join(git)}')
+
+        # Get system info
+        pid = os.getpid()
+        py = psutil.Process(pid)
+
+        cpu = py.cpu_percent()
+        mem = py.memory_info()[0]/1000/1000
+
+        embed.add_field(name='System Info', value=f'CPU: `{cpu}%` Mem: `{mem:.2f} MB`', inline=False)
+
         await ctx.send(embed=embed)
 
 def setup(bot):
