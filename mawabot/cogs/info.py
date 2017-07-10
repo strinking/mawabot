@@ -27,6 +27,7 @@ __all__ = [
     'setup',
 ]
 
+CHANNEL_REGEX = re.compile(r'<#([0-9]+)>')
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
 
 REPO = 'strinking/mawabot'
@@ -187,16 +188,31 @@ class Info:
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def cinfo(self, ctx, cid: int = None):
-        ''' Gets information about the current channel '''
+    async def cinfo(self, ctx, name: str = None):
+        ''' Gets information about a given channel '''
 
-        if cid is None:
+        # Read argument
+        channel = None
+        if name is None:
             channel = ctx.channel
         else:
+            match = CHANNEL_REGEX.match(name)
+            if match:
+                cid = match[1]
+            elif channel.isdigit():
+                cid = int(name)
+            elif ctx.guild:
+                channel = discord.utils.find(lambda chan: name == chan.name, ctx.guild.channels)
+            else:
+                channel = None
+
+        # Retrieve channel from ID
+        if channel is None and cid:
             channel = self.bot.get_channel(cid)
 
+        # Couldn't find it
         if channel is None:
-            embed = discord.Embed(description=f'No channel found with ID: `{cid}`', color=discord.Color.red())
+            embed = discord.Embed(description=f'No channel found that matched {name}', color=discord.Color.red())
             embed.set_author(name='Error')
             await ctx.send(embed=embed)
         else:
