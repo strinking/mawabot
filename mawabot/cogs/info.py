@@ -188,7 +188,7 @@ class Info:
 
     @commands.command()
     async def id(self, ctx, *ids: int):
-        ''' Gets information about the given snowflakes '''
+        ''' Gets information about the given snowflake(s) '''
 
         for id in ids:
             embed = discord.Embed(type='rich')

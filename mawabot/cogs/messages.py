@@ -150,7 +150,7 @@ class Messages:
 
     @commands.command()
     async def purge(self, ctx, posts: int = 1):
-        ''' Deletes the last X posts in the channel, not including the trigger. '''
+        ''' Deletes the last X posts in the channel '''
 
         if posts > MAX_DELETE_POSTS:
             logger.error((f'Asked to delete {posts} posts which is greater than '
