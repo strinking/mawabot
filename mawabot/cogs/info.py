@@ -231,7 +231,7 @@ class Info:
 
                 if isinstance(channel, discord.TextChannel):
                     if channel.is_default():
-                        embed.set_author(name=f'{channel.name} (Default)')
+                        embed.set_author(name=f'{channel.name} [DEFAULT]')
 
                     desc.append('Type: `Text`')
                     desc.append(f'Mention: {channel.mention}')
