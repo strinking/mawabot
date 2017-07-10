@@ -230,6 +230,7 @@ class Info:
                         embed.set_author(name=f'{channel.name} (default)')
 
                     desc.append('Type: `Text`')
+                    desc.append(f'Mention: {channel.mention}')
                     desc.append(f'NSFW: `{channel.is_nsfw()}`')
                     desc.append(f'Members: `{len(channel.members)}`')
 
@@ -239,11 +240,13 @@ class Info:
                     desc.append('Type: `Voice`')
                     desc.append(f'Bitrate: `{channel.bitrate}`')
                     connected = len(channel.members)
-                    if channel.user_limit == 0:
-                        limit = '∞'
+                    limit = channel.user_limit
+
+                    if limit == 0:
+                        connstr = f'{connected}'
                     else:
-                        limit = channel.user_limit
-                    desc.append(f'Connected: `{connected}/{limit}`')
+                        connstr = f'{connected}/{limit}'
+                    desc.append(f'Connected: `{connstr}`')
 
             else:
                 # Must be a DM otherwise
