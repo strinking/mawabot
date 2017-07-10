@@ -203,8 +203,6 @@ class Info:
                 cid = int(name)
             elif ctx.guild:
                 channel = discord.utils.find(lambda chan: name == chan.name, ctx.guild.channels)
-            else:
-                channel = None
 
         # Retrieve channel from ID
         if channel is None and cid:
