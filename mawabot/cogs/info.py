@@ -188,9 +188,15 @@ class Info:
             await ctx.send(embed=embed)
 
     @commands.command()
-    async def cinfo(self, ctx, name: str = None):
+    async def cinfo(self, ctx, *names: str):
         ''' Gets information about a given channel '''
 
+        if not names:
+            await self._cinfo(ctx, None)
+        for name in names:
+            await self._cinfo(ctx, name)
+
+    async def _cinfo(self, ctx, name):
         # Read argument
         if name is None:
             channel = ctx.channel
