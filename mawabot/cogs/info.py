@@ -192,14 +192,14 @@ class Info:
         ''' Gets information about a given channel '''
 
         # Read argument
-        channel = None
         if name is None:
             channel = ctx.channel
         else:
+            channel = None
             match = CHANNEL_REGEX.match(name)
             if match:
-                cid = match[1]
-            elif channel.isdigit():
+                cid = int(match[1])
+            elif name.isdigit():
                 cid = int(name)
             elif ctx.guild:
                 channel = discord.utils.find(lambda chan: name == chan.name, ctx.guild.channels)
