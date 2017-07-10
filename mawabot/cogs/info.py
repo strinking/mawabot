@@ -187,6 +187,60 @@ class Info:
             await ctx.send(embed=embed)
 
     @commands.command()
+    async def cinfo(self, ctx, cid: int = None):
+        ''' Gets information about the current channel '''
+
+        if cid is None:
+            channel = ctx.channel
+        else:
+            channel = self.bot.get_channel(cid)
+
+        if channel is None:
+            embed = discord.Embed(description=f'No channel found with ID: `{cid}`', color=discord.Color.red())
+            embed.set_author(name='Error')
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed()
+            embed.timestamp = channel.created_at
+            desc = [f'ID: `{channel.id}`']
+
+            # Check if it is a guild channel
+            if isinstance(channel, discord.abc.GuildChannel):
+                embed.set_author(name=channel.name)
+                desc.append(f'Guild: `{channel.guild.name}`')
+
+                if isinstance(channel, discord.TextChannel):
+                    desc.append('Type: `Text`')
+                    desc.append(f'Default: `{channel.is_default()}`')
+                    desc.append(f'NSFW: `{channel.is_nsfw()}`')
+                    desc.append(f'Members: `{len(channel.members)}`')
+
+                    if channel.topic is not None:
+                        embed.add_field(name='Topic:', value=channel.topic)
+                else:
+                    desc.append('Type: `Voice`')
+                    desc.append(f'Bitrate: `{channel.bitrate}`')
+                    connected = len(channel.members)
+                    if channel.user_limit == 0:
+                        limit = '∞'
+                    else:
+                        limit = channel.user_limit
+                    desc.append(f'Connected: `{connected}/{limit}`')
+
+            else:
+                # Must be a DM otherwise
+                if isinstance(channel, discord.DMChannel):
+                    desc.append('Type: `DM`')
+                    embed.set_author(name=channel.recipient.name)
+                else:
+                    desc.append('Type: `DM Group`')
+                    embed.set_author(name=channel.name)
+                    desc.append(f'Owner: `{channel.owner.name}`')
+
+            embed.description = '\n'.join(desc)
+            await ctx.send(embed=embed)
+
+    @commands.command()
     async def id(self, ctx, *ids: int):
         ''' Gets information about the given snowflake(s) '''
 
