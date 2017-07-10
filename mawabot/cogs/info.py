@@ -226,8 +226,10 @@ class Info:
                 desc.append(f'Guild: `{channel.guild.name}`')
 
                 if isinstance(channel, discord.TextChannel):
+                    if channel.is_default():
+                        embed.set_author(name=f'{channel.name} (default)')
+
                     desc.append('Type: `Text`')
-                    desc.append(f'Default: `{channel.is_default()}`')
                     desc.append(f'NSFW: `{channel.is_nsfw()}`')
                     desc.append(f'Members: `{len(channel.members)}`')
 
