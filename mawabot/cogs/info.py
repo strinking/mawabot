@@ -27,6 +27,7 @@ __all__ = [
     'setup',
 ]
 
+CHANNEL_REGEX = re.compile(r'<#([0-9]+)>')
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
 
 REPO = 'strinking/mawabot'
@@ -184,6 +185,84 @@ class Info:
                     if accounts:
                         embed.add_field(name='Connected Accounts:', value=', '.join(accounts))
 
+            await ctx.send(embed=embed)
+
+    @commands.command()
+    async def cinfo(self, ctx, *names: str):
+        ''' Gets information about a given channel '''
+
+        if not names:
+            await self._cinfo(ctx, None)
+        for name in names:
+            await self._cinfo(ctx, name)
+
+    async def _cinfo(self, ctx, name):
+        # Read argument
+        if name is None:
+            channel = ctx.channel
+        else:
+            channel = None
+            match = CHANNEL_REGEX.match(name)
+            if match:
+                cid = int(match[1])
+            elif name.isdigit():
+                cid = int(name)
+            elif ctx.guild:
+                channel = discord.utils.find(lambda chan: name == chan.name, ctx.guild.channels)
+
+        # Retrieve channel from ID
+        if channel is None and cid:
+            channel = self.bot.get_channel(cid)
+
+        # Couldn't find it
+        if channel is None:
+            embed = discord.Embed(description=f'No channel found that matched {name}', color=discord.Color.red())
+            embed.set_author(name='Error')
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed()
+            embed.timestamp = channel.created_at
+            desc = [f'ID: `{channel.id}`']
+
+            # Check if it is a guild channel
+            if isinstance(channel, discord.abc.GuildChannel):
+                embed.set_author(name=channel.name)
+                desc.append(f'Guild: `{channel.guild.name}`')
+
+                if isinstance(channel, discord.TextChannel):
+                    if channel.is_default():
+                        embed.set_author(name=f'{channel.name} [DEFAULT]')
+
+                    desc.append('Type: `Text`')
+                    desc.append(f'Mention: {channel.mention}')
+                    desc.append(f'NSFW: `{channel.is_nsfw()}`')
+                    desc.append(f'Members: `{len(channel.members)}`')
+
+                    if channel.topic is not None:
+                        embed.add_field(name='Topic:', value=channel.topic)
+                else:
+                    desc.append('Type: `Voice`')
+                    desc.append(f'Bitrate: `{channel.bitrate}`')
+                    connected = len(channel.members)
+                    limit = channel.user_limit
+
+                    if limit == 0:
+                        connstr = f'{connected}'
+                    else:
+                        connstr = f'{connected}/{limit}'
+                    desc.append(f'Connected: `{connstr}`')
+
+            else:
+                # Must be a DM otherwise
+                if isinstance(channel, discord.DMChannel):
+                    desc.append('Type: `DM`')
+                    embed.set_author(name=channel.recipient.name)
+                else:
+                    desc.append('Type: `DM Group`')
+                    embed.set_author(name=channel.name)
+                    desc.append(f'Owner: `{channel.owner.name}`')
+
+            embed.description = '\n'.join(desc)
             await ctx.send(embed=embed)
 
     @commands.command()
