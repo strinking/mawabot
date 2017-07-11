@@ -100,11 +100,9 @@ class Text:
             rand_num = randint(1, 3)
             word = []
 
-            try:
-                for _ in range(rand_num):
+            for _ in range(rand_num):
+                if text:
                     word.append(text.pop(0))
-            except:
-                pass
 
             words.append(' '.join(word))
 
