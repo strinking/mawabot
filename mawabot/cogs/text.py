@@ -97,10 +97,9 @@ class Text:
         words = []
 
         while text:
-            rand_num = randint(1, 3)
             word = []
 
-            for _ in range(rand_num):
+            for _ in range(randint(1, 3)):
                 if text:
                     word.append(text.pop(0))
 
@@ -111,7 +110,6 @@ class Text:
         words.append(last)
 
         await ctx.message.edit(content='\n'.join(words))
-
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
