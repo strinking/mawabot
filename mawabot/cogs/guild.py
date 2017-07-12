@@ -125,6 +125,51 @@ class Guild:
 
             await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.guild_only()
+    async def perms(self, ctx, *names: str):
+        for name in names:
+            role = await self._get_role(ctx.guild, name)
+
+            if role is None:
+                desc = f'**No such role:** {name}'
+                embed = discord.Embed(type='rich', description=desc, color=discord.Color.red())
+            else:
+                perms = role.permissions
+                desc = '\n'.join((
+                    role.mention,
+                    '',
+                    f'Administrator: `{perms.administrator}`',
+                    f'Ban members: `{perms.ban_members}`',
+                    f'Kick members: `{perms.kick_members}`',
+                    f'Manage guild: `{perms.manage_guild}`',
+                    f'Manage channels: `{perms.manage_channels}`',
+                    f'Manage nicknames: `{perms.manage_nicknames}`',
+                    f'Manage roles: `{perms.manage_roles}`',
+                    f'Manage webhooks: `{perms.manage_webhooks}`',
+                    f'Manage emojis: `{perms.manage_emojis}`',
+                    f'View audit log: `{perms.view_audit_log}`',
+                    f'Read messages: `{perms.read_messages}`',
+                    f'Send messages: `{perms.send_messages}`',
+                    f'Add reactions: `{perms.add_reactions}`',
+                    f'Send TTS messages: `{perms.send_tts_messages}`',
+                    f'Embed links: `{perms.embed_links}`',
+                    f'Attach files: `{perms.attach_files}`',
+                    f'Read message history: `{perms.read_message_history}`',
+                    f'Mention \\@everyone: `{perms.mention_everyone}`',
+                    f'External emojis: `{perms.external_emojis}`',
+                    f'Create instant invite: `{perms.create_instant_invite}`',
+                    f'Can connect to voice: `{perms.connect}`',
+                    f'Can speak in voice: `{perms.speak}`',
+                    f'Mute members: `{perms.mute_members}`',
+                    f'Deafen members: `{perms.deafen_members}`',
+                    f'Move members: `{perms.move_members}`',
+                    f'Use voice activation: `{perms.use_voice_activation}`',
+                    f'Change nickname: `{perms.change_nickname}`',
+                ))
+                embed = discord.Embed(type='rich', description=desc, color=role.color)
+            await ctx.send(embed=embed)
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = Guild(bot)
