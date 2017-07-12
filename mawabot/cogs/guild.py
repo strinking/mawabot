@@ -96,7 +96,8 @@ class Guild:
         ''' Lists information about roles on the guild '''
 
         if name is None:
-            desc = ' '.join(map(lambda x: x.mention, ctx.guild.role_hierarchy))
+            fmt_role = lambda role: f'{role.mention} ({len(role.members)})'
+            desc = ', '.join(map(fmt_role, ctx.guild.role_hierarchy))
             embed = discord.Embed(type='rich', description=desc)
             await ctx.send(embed=embed)
         else:
