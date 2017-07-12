@@ -107,13 +107,17 @@ class Guild:
                 desc = f'**No such role:** {name}'
                 embed = discord.Embed(type='rich', description=desc, color=discord.Color.red())
             else:
+                rgb = role.color.to_rgb()
                 desc = '\n'.join((
                     role.mention,
                     f'Members: `{len(role.members)}`',
                     f'Hoisted: `{role.hoist}`',
                     f'Position: `{role.position}`',
                     f'Mentionable: `{role.mentionable}`',
+                    f'Permissions: `{role.permissions.value}`',
+                    f'Color (RGB): `{rgb[0]}, {rgb[1]}, {rgb[2]}`',
                 ))
+
                 embed = discord.Embed(type='rich', description=desc, color=role.color)
                 embed.set_author(name=role.name)
                 embed.add_field(name='ID:', value=role.id)
