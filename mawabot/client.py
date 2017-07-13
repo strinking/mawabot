@@ -102,9 +102,9 @@ class Bot(commands.Bot):
         logger.info('------')
         logger.info('Ready!')
 
-        await self.change_presence(status=discord.Status.invisible)
         logger.info('Setting status to invisible')
-    
+        await self.change_presence(status=discord.Status.invisible)
+
     async def on_resumed(self):
         ''' Used when the bot reconnects '''
 
