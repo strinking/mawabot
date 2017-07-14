@@ -128,6 +128,29 @@ class General:
         await ctx.send(embed=embed)
         await fut
 
+    @commands.command()
+    @commands.guild_only()
+    async def rmention(self, ctx, *names: str):
+        ''' Mentions the given role(s) in an embed '''
+
+        if not names:
+            return
+
+        ids = []
+        for name in names:
+            if name.isdigit():
+                ids.append(int(name))
+            else:
+                name = name.lower()
+                role = discord.utils.find(lambda r: r.name.lower() == name, ctx.guild.roles)
+                ids.append(getattr(role, 'id', 0))
+
+        fut = ctx.message.delete()
+        desc = '\n'.join((f'<@&{id}>' for id in ids))
+        embed = discord.Embed(type='rich', description=desc)
+        await ctx.send(embed=embed)
+        await fut
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
     cog = General(bot)
