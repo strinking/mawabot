@@ -19,6 +19,7 @@ import unicodedata
 import aiohttp
 import discord
 import psutil
+import time
 from discord.ext import commands
 
 from mawabot import __version__ as version
@@ -328,6 +329,12 @@ class Info:
 
         uptime = str(self.bot.uptime).split('.')[0]
         await ctx.message.edit(content=f'`{uptime}`')
+
+    @commands.command()
+    async def unixtime(self, ctx):
+        ''' Gets the current UNIX timestamp '''
+
+        await ctx.message.edit(content=f'`{time.time()}`')
 
     @commands.command()
     async def stats(self, ctx):
