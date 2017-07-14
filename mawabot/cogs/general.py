@@ -119,6 +119,9 @@ class General:
     async def mention(self, ctx, *ids: int):
         ''' Mentions the given user(s) in an embed '''
 
+        if not ids:
+            return
+
         fut = ctx.message.delete()
         desc = '\n'.join((f'<@!{id}>' for id in ids))
         embed = discord.Embed(type='rich', description=desc)
