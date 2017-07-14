@@ -15,6 +15,8 @@ import math
 import random
 import re
 
+from .. import utils
+
 import discord
 from discord.ext import commands
 
@@ -32,6 +34,25 @@ class General:
 
     def __init__(self, bot):
         self.bot = bot
+
+    def _get_user_mention(self, name):
+        if name.isdigit():
+            id = int(name)
+            user = self.bot.get_user(id)
+        else:
+            name = utils.normalize_caseless(name)
+            user = discord.utils.find(lambda u: utils.normalize_caseless(u.name) == name, self.bot.users)
+        return getattr(user, 'mention', '(No such user)')
+
+    @staticmethod
+    def _get_role_mention(guild, name):
+        if name.isdigit():
+            id = int(name)
+            role = discord.utils.find(lambda r: r.id == id, guild.roles)
+        else:
+            name = name.lower()
+            role = discord.utils.find(lambda r: r.name.lower() == name, guild.roles)
+        return getattr(role, 'mention', '(No such role)')
 
     @commands.command()
     async def ping(self, ctx):
@@ -116,14 +137,14 @@ class General:
         await self.bot.change_presence(game=game)
 
     @commands.command()
-    async def mention(self, ctx, *ids: int):
+    async def mention(self, ctx, *names: str):
         ''' Mentions the given user(s) in an embed '''
 
-        if not ids:
+        if not names:
             return
 
         fut = ctx.message.delete()
-        desc = '\n\n'.join((f'<@!{id}>' for id in ids))
+        desc = '\n\n'.join((self._get_user_mention(name) for name in names))
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut
@@ -136,17 +157,8 @@ class General:
         if not names:
             return
 
-        ids = []
-        for name in names:
-            if name.isdigit():
-                ids.append(int(name))
-            else:
-                name = name.lower()
-                role = discord.utils.find(lambda r: r.name.lower() == name, ctx.guild.roles)
-                ids.append(getattr(role, 'id', 0))
-
         fut = ctx.message.delete()
-        desc = '\n\n'.join((f'<@&{id}>' for id in ids))
+        desc = '\n\n'.join((self._get_role_mention(ctx.guild, name) for name in names))
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut

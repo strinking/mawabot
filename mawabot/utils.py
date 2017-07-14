@@ -11,6 +11,7 @@
 #
 
 import logging
+import unicodedata
 
 import discord
 from discord.ext import commands
@@ -18,6 +19,11 @@ from discord.ext import commands
 logger = logging.getLogger(__name__)
 
 COGS_DIR = 'mawabot.cogs.'
+
+__all__ = [
+    'Reloader',
+    'normalize_caseless',
+]
 
 class Reloader:
 
@@ -54,7 +60,7 @@ class Reloader:
             embed = discord.Embed(color=discord.Color.green(), description=f'```{cogname}```')
             embed.set_author(name='Loaded')
             await ctx.send(embed=embed)
-    
+
     @commands.command()
     async def unload(self, ctx, cogname: str):
         ''' Unloads the cog given '''
@@ -75,7 +81,7 @@ class Reloader:
             embed = discord.Embed(color=discord.Color.green(), description=f'```{cogname}```')
             embed.set_author(name='Unloaded')
             await ctx.send(embed=embed)
-    
+
     @commands.command()
     async def reload(self, ctx, cogname: str):
         ''' Reloads the cog given '''
@@ -97,3 +103,7 @@ class Reloader:
             embed = discord.Embed(color=discord.Color.green(), description=f'```{cogname}```')
             embed.set_author(name='Reloaded')
             await ctx.send(embed=embed)
+
+def normalize_caseless(s):
+    return unicodedata.normalize('NFKD', s.casefold())
+
