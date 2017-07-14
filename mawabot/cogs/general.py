@@ -123,7 +123,7 @@ class General:
             return
 
         fut = ctx.message.delete()
-        desc = '\n'.join((f'<@!{id}>' for id in ids))
+        desc = '\n\n'.join((f'<@!{id}>' for id in ids))
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut
@@ -146,7 +146,7 @@ class General:
                 ids.append(getattr(role, 'id', 0))
 
         fut = ctx.message.delete()
-        desc = '\n'.join((f'<@&{id}>' for id in ids))
+        desc = '\n\n'.join((f'<@&{id}>' for id in ids))
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut
