@@ -16,10 +16,6 @@ import re
 import discord
 from discord.ext import commands
 
-__all__ = [
-    'setup',
-]
-
 NUMERIC_REGEX = re.compile(r'[0-9]+')
 ROLE_MENTION_REGEX = re.compile(r'<@&([0-9]+)>')
 
@@ -169,8 +165,3 @@ class Guild:
                 ))
                 embed = discord.Embed(type='rich', description=desc, color=role.color)
             await ctx.send(embed=embed)
-
-def setup(bot):
-    ''' Setup function to add cog to bot '''
-    cog = Guild(bot)
-    bot.add_cog(cog)

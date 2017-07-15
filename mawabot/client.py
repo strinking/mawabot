@@ -19,6 +19,7 @@ import datetime
 import logging
 import re
 from os import listdir
+from os.path import isdir
 
 import discord
 from discord.ext import commands
@@ -78,7 +79,7 @@ class Bot(commands.Bot):
         self.add_cog(Reloader(self))
         logger.info('Loaded cog: Reloader')
 
-        files = [PY_FILE_REGEX.sub('', file) for file in listdir('mawabot/cogs') if '.py' in file]
+        files = [cog for cog in listdir('mawabot/cogs') if isdir(f'mawabot/cogs/{cog}')]
 
         logger.debug(f'Files found: {files}')
 
