@@ -17,9 +17,8 @@ Holds the custom discord client
 
 import datetime
 import logging
+import os
 import re
-from os import listdir
-from os.path import isdir
 
 import discord
 from discord.ext import commands
@@ -79,9 +78,11 @@ class Bot(commands.Bot):
         self.add_cog(Reloader(self))
         logger.info('Loaded cog: Reloader')
 
-        files = [cog for cog in listdir('mawabot/cogs') if isdir(f'mawabot/cogs/{cog}')]
+        def _cog_ok(cog):
+            return cog[0] != '_' and os.path.isdir(f'mawabot/cogs/{cog}')
 
-        logger.debug(f'Files found: {files}')
+        files = [cog for cog in os.listdir('mawabot/cogs') if _cog_ok(cog)]
+        logger.debug(f'Cogs found: {files}')
 
         for file in files:
             try:
