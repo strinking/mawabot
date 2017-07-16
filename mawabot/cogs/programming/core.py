@@ -63,8 +63,3 @@ class Programming:
             embed.description = f'{ex.__class__.__name__}: {ex}'
 
         await ctx.send(embed=embed)
-
-def setup(bot):
-    ''' Setup function to add cog to bot '''
-    cog = Programming(bot)
-    bot.add_cog(cog)

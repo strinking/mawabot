@@ -15,14 +15,10 @@ import math
 import random
 import re
 
-from .. import utils
+from mawabot import utils
 
 import discord
 from discord.ext import commands
-
-__all__ = [
-    'setup',
-]
 
 DICE_REGEX = re.compile(r'(?:([0-9]+)?\s*d)?\s*([0-9]+)', re.IGNORECASE)
 MATH_LOCALS = {name: getattr(math, name) for name in dir(math) if not name.startswith('_')}
@@ -162,8 +158,3 @@ class General:
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut
-
-def setup(bot):
-    ''' Setup function to add cog to bot '''
-    cog = General(bot)
-    bot.add_cog(cog)

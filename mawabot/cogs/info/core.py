@@ -369,8 +369,3 @@ class Info:
         embed.add_field(name='System Info', value=f'CPU: `{cpu}%` Mem: `{mem:.2f} MiB`', inline=False)
 
         await ctx.send(embed=embed)
-
-def setup(bot):
-    ''' Setup function to add cog to bot '''
-    cog = Info(bot)
-    bot.add_cog(cog)

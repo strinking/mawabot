@@ -17,9 +17,6 @@ import logging
 import discord
 from discord.ext import commands
 
-__all__ = [
-    'setup',
-]
 
 MAX_DELETE_POSTS = 30
 
@@ -162,8 +159,3 @@ class Messages:
                 await msg.delete()
             except discord.errors.DiscordException as ex:
                 logger.error(f'Cannot delete message {msg.id}: {ex}')
-
-def setup(bot):
-    ''' Setup function to add cog to bot '''
-    cog = Messages(bot)
-    bot.add_cog(cog)

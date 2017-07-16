@@ -17,8 +17,8 @@ Holds the custom discord client
 
 import datetime
 import logging
+import os
 import re
-from os import listdir
 
 import discord
 from discord.ext import commands
@@ -26,8 +26,6 @@ from discord.ext import commands
 from .utils import Reloader
 
 logger = logging.getLogger(__name__)
-
-PY_FILE_REGEX = re.compile(r'\.py$', re.IGNORECASE)
 
 class Bot(commands.Bot):
     ''' The custom discord ext bot '''
@@ -54,7 +52,7 @@ class Bot(commands.Bot):
         return datetime.datetime.utcnow() - self.start_time
 
     def run(self):
-        '''Replace discord clients run command to inculde token from config
+        ''' Replace discord clients run command to include token from config
         If the token is empty or incorrect raises LoginError
         '''
 
@@ -78,9 +76,11 @@ class Bot(commands.Bot):
         self.add_cog(Reloader(self))
         logger.info('Loaded cog: Reloader')
 
-        files = [PY_FILE_REGEX.sub('', file) for file in listdir('mawabot/cogs') if '.py' in file]
+        def _cog_ok(cog):
+            return cog[0] != '_' and os.path.isdir(f'mawabot/cogs/{cog}')
 
-        logger.debug(f'Files found: {files}')
+        files = [cog for cog in os.listdir('mawabot/cogs') if _cog_ok(cog)]
+        logger.debug(f'Cogs found: {files}')
 
         for file in files:
             try:
