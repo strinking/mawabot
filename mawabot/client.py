@@ -55,7 +55,7 @@ class Bot(commands.Bot):
         return datetime.datetime.utcnow() - self.start_time
 
     def run(self):
-        '''Replace discord clients run command to inculde token from config
+        ''' Replace discord clients run command to include token from config
         If the token is empty or incorrect raises LoginError
         '''
 
