@@ -27,8 +27,6 @@ from .utils import Reloader
 
 logger = logging.getLogger(__name__)
 
-PY_FILE_REGEX = re.compile(r'\.py$', re.IGNORECASE)
-
 class Bot(commands.Bot):
     ''' The custom discord ext bot '''
 
