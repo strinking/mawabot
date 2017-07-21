@@ -111,7 +111,7 @@ class Guild:
                     f'Position: `{role.position}`',
                     f'Mentionable: `{role.mentionable}`',
                     f'Permissions: `{role.permissions.value}`',
-                    f'Color (RGB): `{rgb[0]}, {rgb[1]}, {rgb[2]}`',
+                    f'Hex Color: `{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}`',
                 ))
 
                 embed = discord.Embed(type='rich', description=desc, color=role.color)
