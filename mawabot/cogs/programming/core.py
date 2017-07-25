@@ -57,7 +57,7 @@ class Programming:
         try:
             result = eval(expr)
             embed.color = discord.Color.teal()
-            embed.description = repr(result)
+            embed.description = f'`{result!r}`'
         except Exception as ex:
             embed.color = discord.Color.red()
             embed.description = f'{ex.__class__.__name__}: {ex}'
