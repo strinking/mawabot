@@ -46,11 +46,11 @@ class Messages:
 
     # Commands
     @commands.command()
-    async def hit(self, ctx, *, content: str):
+    async def hit(self, ctx, *, content: str = None):
         ''' Sends the given message and then immediately deletes it '''
 
         fut = ctx.message.delete()
-        if content:
+        if content is not None:
             await ctx.send(content=content, delete_after=0)
         await fut
 
