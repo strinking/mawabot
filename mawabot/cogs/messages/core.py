@@ -50,7 +50,8 @@ class Messages:
         ''' Sends the given message and then immediately deletes it '''
 
         fut = ctx.message.delete()
-        await ctx.send(content=content, delete_after=0)
+        if content:
+            await ctx.send(content=content, delete_after=0)
         await fut
 
     @commands.command()
