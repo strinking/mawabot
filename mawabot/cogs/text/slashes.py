@@ -10,7 +10,6 @@
 # WITHOUT ANY WARRANTY. See the LICENSE file for more details.
 #
 
-import discord
 from discord.ext import commands
 
 __all__ = [
