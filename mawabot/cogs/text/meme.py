@@ -12,7 +12,8 @@
 
 ''' Has commands for meme-y text transformation '''
 
-import discord
+import random
+
 from discord.ext import commands
 
 __all__ = [
@@ -57,7 +58,7 @@ class Meme:
         while text:
             word = []
 
-            for _ in range(randint(1, 3)):
+            for _ in range(random.randint(1, 3)):
                 if text:
                     word.append(text.pop(0))
 

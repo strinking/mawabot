@@ -45,9 +45,13 @@ class Math:
             '**Output:**',
         ]
 
+        # For embed.color
+        # pylint: disable=assigning-non-slot
+
         try:
+            # pylint: disable=eval-used
             result = eval(expr, MATH_LOCALS)
-            if type(result) == float:
+            if isinstance(result, float):
                 lines.append(f'{result:.4f}')
             else:
                 lines.append(str(result))

@@ -12,11 +12,10 @@
 
 ''' Has commands for text transformation '''
 import codecs
-from random import randint
 
-import discord
-from discord.ext import commands
 import upsidedown
+
+from discord.ext import commands
 
 __all__ = [
     'Text',

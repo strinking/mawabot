@@ -11,13 +11,11 @@
 #
 
 ''' Has general or miscellaneous commands '''
-import random
-import re
-
-from mawabot import utils
 
 import discord
 from discord.ext import commands
+
+from mawabot import utils
 
 __all__ = [
     'General',

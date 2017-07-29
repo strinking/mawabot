@@ -10,11 +10,9 @@
 # WITHOUT ANY WARRANTY. See the LICENSE file for more details.
 #
 
-''' Has several commands that get various pieces of information '''
-import asyncio
+''' Has several commands that get miscellaneous pieces of information '''
 import time
 
-import discord
 from discord.ext import commands
 
 __all__ = [

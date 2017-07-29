@@ -12,7 +12,9 @@
 
 ''' Holds commands related to dice and probability '''
 
-import discord
+import random
+import re
+
 from discord.ext import commands
 
 DICE_REGEX = re.compile(r'(?:([0-9]+)?\s*d)?\s*([0-9]+)', re.IGNORECASE)

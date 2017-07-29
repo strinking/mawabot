@@ -10,11 +10,12 @@
 # WITHOUT ANY WARRANTY. See the LICENSE file for more details.
 #
 
+''' Contains in-depth commands that get information '''
 import re
 import unicodedata
 
-from discord.ext import commands
 import discord
+from discord.ext import commands
 
 __all__ = [
     'Info',
@@ -74,20 +75,6 @@ class Info:
                     members.append(member)
         return members
 
-    async def get_git_contributors(self):
-        while True:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(GIT_CONTRIBUTORS) as resp:
-                    status = resp.status
-                    data = await resp.json()
-
-            if status == 200:
-                return data
-            elif status == 202:
-                await asyncio.sleep(2)
-            else:
-                return []
-
     @commands.command()
     async def uinfo(self, ctx, *names: str):
         ''' Gets information about the given user(s) '''
@@ -140,6 +127,9 @@ class Info:
                 roles = ' '.join(map(lambda x: x.mention, user.roles[1:]))
                 if roles:
                     lines.append(f'Roles: {roles}')
+
+            # For embed.color
+            # pylint: disable=assigning-non-slot
 
             embed = discord.Embed(type='rich', description='\n'.join(lines))
             embed.timestamp = user.created_at

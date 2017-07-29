@@ -11,17 +11,20 @@
 #
 
 ''' Has commands related to the status of the bot '''
-import aiohttp
-import psutil
+import asyncio
 import os
 
+import aiohttp
+import psutil
+
+import discord
 from discord.ext import commands
 
 from mawabot import __version__ as version
 
 REPO = 'strinking/mawabot'
-GIT_CONTRIBUTORS = f'https://api.github.com/repos/{REPO}/stats/contributors'
 GITHUB_URL = f'https://github.com/{REPO}'
+GIT_CONTRIBUTORS = f'https://api.github.com/repos/{REPO}/stats/contributors'
 
 MiB = 1024 * 1024
 
@@ -36,6 +39,20 @@ class Stats:
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def get_git_contributors(self):
+        while True:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(GIT_CONTRIBUTORS) as resp:
+                    status = resp.status
+                    data = await resp.json()
+
+            if status == 200:
+                return data
+            elif status == 202:
+                await asyncio.sleep(2)
+            else:
+                return []
 
     @commands.command()
     async def stats(self, ctx):

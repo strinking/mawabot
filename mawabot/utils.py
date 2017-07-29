@@ -106,4 +106,3 @@ class Reloader:
 
 def normalize_caseless(s):
     return unicodedata.normalize('NFKD', s.casefold())
-
