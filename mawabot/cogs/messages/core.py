@@ -81,7 +81,7 @@ class Messages:
         if cid:
             channel = self.bot.get_channel(cid)
             if channel is None:
-                logger.warn(f'Cannot find the channel with ID {cid}')
+                logger.warning(f'Cannot find the channel with ID {cid}')
                 return
         else:
             channel = ctx.channel

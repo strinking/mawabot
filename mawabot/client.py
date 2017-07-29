@@ -18,7 +18,6 @@ Holds the custom discord client
 import datetime
 import logging
 import os
-import re
 
 import discord
 from discord.ext import commands
@@ -51,7 +50,7 @@ class Bot(commands.Bot):
         ''' Gets the uptime for the bot '''
         return datetime.datetime.utcnow() - self.start_time
 
-    def run(self):
+    def run_with_token(self):
         ''' Replace discord clients run command to include token from config
         If the token is empty or incorrect raises LoginError
         '''
@@ -60,7 +59,7 @@ class Bot(commands.Bot):
             err_msg = 'Token is empty. Please open the config file and add your token!'
             logger.critical(err_msg)
         else:
-            return super().run(self.config['token'], bot=False)
+            return self.run(self.config['token'], bot=False)
 
     async def on_ready(self):
         ''' When bot has fully logged on
@@ -69,7 +68,7 @@ class Bot(commands.Bot):
         '''
 
         if self.config['output-channel'] is None:
-            logger.warn('No output channel set in config.')
+            logger.warning('No output channel set in config.')
         else:
             self.output_chan = self.get_channel(int(self.config['output-channel']))
 
@@ -113,6 +112,6 @@ class Bot(commands.Bot):
 
     async def _send(self, *args, **kwargs):
         if self.output_chan is None:
-            logger.warn('No output channel set!')
+            logger.warning('No output channel set!')
         else:
             await self.output_chan.send(*args, **kwargs)

@@ -1,5 +1,5 @@
 #
-# cogs/guild.py
+# cogs/guild/core.py
 #
 # mawabot - Maware's selfbot
 # Copyright (c) 2017 Ma-wa-re, Ammon Smith
@@ -27,7 +27,6 @@ class Guild:
     def __init__(self, bot):
         self.bot = bot
 
-    # Helper methods
     @staticmethod
     async def _get_role(guild, name):
         id = None
@@ -53,7 +52,6 @@ class Guild:
                     return role
         return None
 
-    # Commands
     @commands.command()
     @commands.guild_only()
     async def ginfo(self, ctx):
