@@ -12,6 +12,7 @@
 
 from .core import Text
 from .meme import Meme
+from .slashes import Slashes
 
 __all__ = [
     'setup',
@@ -19,5 +20,6 @@ __all__ = [
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
+    bot.add_cog(Slashes(bot))
     bot.add_cog(Text(bot))
     bot.add_cog(Meme(bot))
