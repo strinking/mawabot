@@ -14,6 +14,7 @@
 
 import random
 import re
+import subprocess
 
 from discord.ext import commands
 
@@ -121,3 +122,32 @@ class Meme:
         words.append(last)
 
         await ctx.message.edit(content='\n'.join(words))
+
+    async def _cowsay(self, args, text):
+        text = text.replace('\n', '\n\n').replace("```", "'''")
+        args.append(text)
+        output = subprocess.check_output(args, stderr=subprocess.DEVNULL, timeout=0.5)
+        content = '\n'.join((
+            '```',
+            output.decode('utf-8'),
+            '```',
+        ))
+        return content
+
+    @commands.command()
+    async def cowsay(self, ctx, *, text: str):
+        ''' Replaces the given text with cowsay '''
+        content = await self._cowsay(['cowsay'], text)
+        await ctx.message.edit(content=content)
+
+    @commands.command()
+    async def cowthink(self, ctx, *, text: str):
+        ''' Replaces the given text with cowthink '''
+        content = await self._cowsay(['cowthink'], text)
+        await ctx.message.edit(content=content)
+
+    @commands.command()
+    async def cowcustom(self, ctx, cowfile: str, *, text: str):
+        ''' Replaces the given text with the given cow file '''
+        content = await self._cowsay(['cowsay', '-f', cowfile], text)
+        await ctx.message.edit(content=content)
