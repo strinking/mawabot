@@ -101,7 +101,7 @@ class Meme:
         await ctx.message.edit(content='\n'.join(lines))
 
     @commands.command()
-    async def kerrhau(self, ctx, *text: str):
+    async def kerrhau(self, ctx, *, text: str):
         ''' "kerrhau"-ifys the given text '''
 
         text = list(text)

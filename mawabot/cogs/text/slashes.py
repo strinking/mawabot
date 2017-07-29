@@ -26,49 +26,49 @@ class Slashes:
         self.bot = bot
 
     @commands.command()
-    async def tableflip(self, ctx, text: str = ''):
+    async def tableflip(self, ctx, *, text: str = ''):
         ''' (╯°□°）╯︵ ┻━┻ '''
 
-        content = text + r'(╯°□°）╯︵ ┻━┻'
+        content = text + r' (╯°□°）╯︵ ┻━┻'
         await ctx.message.edit(content=content)
 
     @commands.command()
-    async def unflip(self, ctx, text: str = ''):
+    async def unflip(self, ctx, *, text: str = ''):
         ''' ┬──┬﻿ ノ( ゜-゜ノ) '''
 
         content = text + ' ┬─┬﻿ ノ( ゜-゜ノ)'
         await ctx.message.edit(content=content)
 
     @commands.command()
-    async def justright(self, ctx, text: str = ''):
+    async def justright(self, ctx, *, text: str = ''):
         ''' ✋😩👌 '''
 
         content = text + r' ✋😩👌'
         await ctx.message.edit(content=content)
 
     @commands.command()
-    async def culol(self, ctx, text: str = ''):
+    async def culol(self, ctx, *, text: str = ''):
         ''' 😂 👌 '''
 
         content = text + r' 😂 👌'
         await ctx.message.edit(content=content)
 
     @commands.command()
-    async def shrug(self, ctx, text: str = ''):
+    async def shrug(self, ctx, *, text: str = ''):
         ''' ¯\\_(ツ)_/¯ '''
 
         content = text + r' ¯\_(ツ)_/¯'
         await ctx.message.edit(content=content)
 
     @commands.command()
-    async def lenny(self, ctx, text: str = ''):
+    async def lenny(self, ctx, *, text: str = ''):
         ''' ( ͡° ͜ʖ ͡°) '''
 
         content = text + ' ( ͡° ͜ʖ ͡°)'
         await ctx.message.edit(content=content)
 
     @commands.command()
-    async def wtf(self, ctx, text: str = ''):
+    async def wtf(self, ctx, *, text: str = ''):
         ''' ಠ_ಠ '''
 
         content = text + ' ಠ_ಠ'
