@@ -79,4 +79,4 @@ if __name__ == '__main__':
     # Open and run client
     logger.info("Starting bot...")
     bot = client.Bot(config)
-    bot.run()
+    bot.run_with_token()
