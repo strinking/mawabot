@@ -17,7 +17,7 @@ import discord
 from discord.ext import commands
 
 __all__ = [
-    'setup',
+    'Programming',
 ]
 
 logger = logging.getLogger(__file__)
@@ -30,6 +30,9 @@ class Programming:
     def __init__(self, bot):
         self.bot = bot
 
+    # For embed.color
+    # pylint: disable=assigning-non-slot
+
     @commands.command()
     async def exec(self, ctx, *, command: str):
         ''' Evaluates an arbitrary Python command '''
@@ -38,6 +41,7 @@ class Programming:
         embed = discord.Embed(type='rich')
         embed.set_author(name=command)
         try:
+            # pylint: disable=exec-used
             exec(command)
             embed.color = discord.Color.green()
             embed.description = 'Success'
@@ -55,6 +59,7 @@ class Programming:
         embed = discord.Embed(type='rich')
         embed.set_author(name=expr)
         try:
+            # pylint: disable=eval-used
             result = eval(expr)
             embed.color = discord.Color.teal()
             embed.description = f'`{result!r}`'

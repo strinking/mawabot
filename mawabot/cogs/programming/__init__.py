@@ -12,6 +12,10 @@
 
 from .core import Programming
 
+__all__ = [
+    'setup',
+]
+
 def setup(bot):
     ''' Setup function to add cog to bot '''
-    bot.add_cog(Programming(cog))
+    bot.add_cog(Programming(bot))
