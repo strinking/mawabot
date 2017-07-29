@@ -1,5 +1,5 @@
 #
-# cogs/programming.py
+# cogs/programming/core.py
 #
 # mawabot - Maware's selfbot
 # Copyright (c) 2017 Ma-wa-re, Ammon Smith
