@@ -88,6 +88,9 @@ class Programming:
             type = 'Binary'
             text = ''.join(chars)
 
+        if len(text) > 950:
+            text = text[:950] + '\n...output too long...'
+
         return '\n'.join((
             f'{type}:',
             '```',
