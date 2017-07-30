@@ -120,3 +120,15 @@ class Programming:
 
         await ctx.send(embed=embed)
         await fut
+
+    @commands.command()
+    async def sh2(self, ctx, *, command: str):
+        ''' Evalulates a shell command, but outputs in a normal code block '''
+
+        try:
+            binary = subprocess.check_output(['/bin/bash', '-c', command], timeout=3)
+            content = self._get_text(binary)
+        except subprocess.CalledProcessError as err:
+            content = f'Command failed, return code: {err.returncode}'
+
+        await ctx.send(content=content)
