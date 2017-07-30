@@ -60,7 +60,7 @@ class General:
             content = f'Unset game'
 
         await self.bot.change_presence(game=game)
-        await ctx.edit(content=content)
+        await ctx.message.edit(content=content)
 
     def _get_user_mention(self, name):
         if name.isdigit():
