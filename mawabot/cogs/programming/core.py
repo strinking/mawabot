@@ -77,7 +77,7 @@ class Programming:
                 raise ValueError
 
             type = 'Text'
-            text = binary.decode('utf-8')
+            text = binary.decode('utf-8').replace("```", "'''")
         except (UnicodeDecodeError, ValueError):
             chars = []
             for i, byte in enumerate(binary):
