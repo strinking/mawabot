@@ -103,9 +103,12 @@ class Programming:
         result = subprocess.run(['/bin/sh', '-c', command], timeout=3,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        embed = discord.Embed(type='rich', description=f'**Return Code:** {result.returncode}')
+        embed = discord.Embed(type='rich')
         embed.set_author(name=command)
         embed.color = discord.Color.dark_red() if result.returncode else discord.Color.green()
+
+        if result.returncode or not (result.stdout or result.stderr):
+            embed.description = f'**Return Code:** {result.returncode}'
 
         if result.stdout:
             embed.add_field(name='stdout', value=self._get_text(result.stdout))
