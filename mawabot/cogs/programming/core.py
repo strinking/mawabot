@@ -100,7 +100,7 @@ class Programming:
         ''' Evaluates an arbitrary shell command '''
 
         fut = ctx.message.delete()
-        result = subprocess.run(['/bin/sh', '-c', command], timeout=3,
+        result = subprocess.run(['/bin/bash', '-c', command], timeout=3,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         embed = discord.Embed(type='rich')
