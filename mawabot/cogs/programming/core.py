@@ -12,9 +12,11 @@
 
 ''' Has commands for programming '''
 import logging
+import subprocess
 
 import discord
 from discord.ext import commands
+from hexdump import hexdump
 
 __all__ = [
     'Programming',
@@ -68,3 +70,31 @@ class Programming:
             embed.description = f'{ex.__class__.__name__}: {ex}'
 
         await ctx.send(embed=embed)
+
+    @staticmethod
+    def _get_text(binary):
+        try:
+            type = 'Text'
+            text = binary.decode('utf-8')
+        except UnicodeDecodeError:
+            type = 'Binary'
+            text = hexdump(binary, 'return')
+
+        return '\n'.join((
+            f'{type}:',
+            '```',
+            text,
+            '```',
+        ))
+
+    @commands.command()
+    async def sh(self, ctx, *, expr: str):
+        ''' Evaluates an arbitrary shell command '''
+
+        result = subprocess.run(['/bin/sh', '-c', expr], timeout=3,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        embed = discord.Embed(type='rich', description=f'Return code: {result.returncode}')
+        if result.stdout:
+            embed.add_field(name='stdout', value=self._get_text(result.stdout))
+        if result.stderr:
+            embed.add_field(name='stderr', value=self._get_text(result.stderr))
