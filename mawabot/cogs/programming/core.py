@@ -96,13 +96,21 @@ class Programming:
         ))
 
     @commands.command()
-    async def sh(self, ctx, *, expr: str):
+    async def sh(self, ctx, *, command: str):
         ''' Evaluates an arbitrary shell command '''
 
-        result = subprocess.run(['/bin/sh', '-c', expr], timeout=3,
+        fut = ctx.message.delete()
+        result = subprocess.run(['/bin/sh', '-c', command], timeout=3,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        embed = discord.Embed(type='rich', description=f'Return code: {result.returncode}')
+
+        embed = discord.Embed(type='rich', description=f'**Return Code:** {result.returncode}')
+        embed.set_author(name=command)
+        embed.color = discord.Color.dark_red() if result.returncode else discord.Color.green()
+
         if result.stdout:
             embed.add_field(name='stdout', value=self._get_text(result.stdout))
         if result.stderr:
             embed.add_field(name='stderr', value=self._get_text(result.stderr))
+
+        await ctx.send(embed=embed)
+        await fut
