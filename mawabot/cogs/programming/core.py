@@ -129,6 +129,6 @@ class Programming:
             binary = subprocess.check_output(['/bin/bash', '-c', command], timeout=3)
             content = self._get_text(binary)
         except subprocess.CalledProcessError as err:
-            content = f'Command failed, return code: {err.returncode}'
+            content = f'```\nReturn code: {err.returncode}\n```'
 
         await ctx.send(content=content)
