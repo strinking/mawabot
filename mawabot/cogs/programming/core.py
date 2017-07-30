@@ -103,7 +103,7 @@ class Programming:
         ''' Evaluates an arbitrary shell command '''
 
         fut = ctx.message.delete()
-        result = subprocess.run(['/bin/bash', '-c', command], timeout=3,
+        result = subprocess.run(command, shell=True timeout=3,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         embed = discord.Embed(type='rich')
@@ -126,7 +126,7 @@ class Programming:
         ''' Evalulates a shell command, but outputs in a normal code block '''
 
         try:
-            binary = subprocess.check_output(['/bin/bash', '-c', command], timeout=3)
+            binary = subprocess.check_output(command, shell=True, timeout=3)
             content = self._get_text(binary)
         except subprocess.CalledProcessError as err:
             content = f'```\nReturn code: {err.returncode}\n```'
