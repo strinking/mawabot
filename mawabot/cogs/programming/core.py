@@ -16,7 +16,6 @@ import subprocess
 
 import discord
 from discord.ext import commands
-from hexdump import hexdump
 
 __all__ = [
     'Programming',
@@ -74,11 +73,20 @@ class Programming:
     @staticmethod
     def _get_text(binary):
         try:
+            if 0 in binary:
+                raise ValueError
+
             type = 'Text'
             text = binary.decode('utf-8')
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, ValueError):
+            chars = []
+            for i, byte in enumerate(binary):
+                chars.append(f'{byte:02x}')
+                if i % 2 == 1:
+                    chars.append(' ')
+
             type = 'Binary'
-            text = hexdump(binary, 'return')
+            text = ''.join(chars)
 
         return '\n'.join((
             f'{type}:',
