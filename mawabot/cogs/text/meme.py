@@ -82,8 +82,10 @@ class Meme:
                 return s
             return '\u200b'.join(self.regional_emojis.get(c.lower(), c) for c in s)
 
+        fut = ctx.message.delete()
         content = ''.join(map(mapper, DISCORD_STRINGS.split(text)))
-        await ctx.message.edit(content=content)
+        await ctx.send(content=content)
+        await fut
 
     @commands.command()
     async def sw(self, ctx, *, text: str):
