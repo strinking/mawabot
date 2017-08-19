@@ -107,8 +107,14 @@ class Messages:
         for msg in to_copy:
             if msg.content:
                 content = '\n'.join((
+                    'Plain:',
                     '```',
                     msg.content.replace("`", "'"),
+                    '```',
+                    '',
+                    'Hexdump:',
+                    '```',
+                    ' '.join(f'{b:02x}' for b in msg.content.encode('utf-8')),
                     '```',
                 ))
             else:
