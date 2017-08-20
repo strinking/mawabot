@@ -54,6 +54,20 @@ class Guild:
 
     @commands.command()
     @commands.guild_only()
+    async def ack(self, ctx, *names: str):
+        ''' Marks all messages in the current guild as read. '''
+
+        await ctx.guild.ack()
+
+    @commands.command()
+    async def ackall(self, ctx):
+        ''' Marks all message in all guilds as read. '''
+
+        for guild in self.bot.guilds:
+            await guild.ack()
+
+    @commands.command()
+    @commands.guild_only()
     async def ginfo(self, ctx):
         ''' Prints information about the current guild '''
 
