@@ -79,7 +79,30 @@ class General:
             return
 
         fut = ctx.message.delete()
-        desc = '\n\n'.join((self._get_user_mention(name) for name in names))
+        desc = '\n\n'.join(map(self._get_user_mention, names))
+        embed = discord.Embed(type='rich', description=desc)
+        await ctx.send(embed=embed)
+        await fut
+
+    def _get_channel_mention(self, name, guild=None):
+        if name.isdigit():
+            id = int(name)
+            chan = self.bot.get_channel(id)
+        else:
+            name = utils.normalize_caseless(name)
+            channels = guild.channels if guild else self.bot.get_all_channels()
+            chan = discord.utils.find(lambda c: utils.normalize_caseless(c.name) == name, channels)
+        return getattr(chan, 'mention', '(No such channel)')
+
+    @commands.command()
+    async def cmention(self, ctx, *names: str):
+        ''' Mentions the given channel(s) in an embed '''
+
+        if not names:
+            return
+
+        fut = ctx.message.delete()
+        desc = '\n\n'.join(self._get_channel_mention(name, ctx.guild) for name in names)
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut
@@ -102,7 +125,7 @@ class General:
             return
 
         fut = ctx.message.delete()
-        desc = '\n\n'.join((self._get_role_mention(ctx.guild, name) for name in names))
+        desc = '\n\n'.join(self._get_role_mention(ctx.guild, name) for name in names)
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
         await fut
