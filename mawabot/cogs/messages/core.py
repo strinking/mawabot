@@ -112,9 +112,9 @@ class Messages:
                     msg.content.replace("`", "'"),
                     '```',
                     '',
-                    'Hexdump:',
+                    'Chars:',
                     '```',
-                    ' '.join(f'{b:02x}' for b in msg.content.encode('utf-8')),
+                    ' '.join(f'{ord(c):02x}' for c in msg.content),
                     '```',
                 ))
             else:
