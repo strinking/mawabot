@@ -169,6 +169,6 @@ class Guild:
     async def channels(self, ctx):
         ''' Lists all channels in the current guild. '''
 
-        desc = '\n'.join(chan.mention for chan in ctx.guild.channels)
+        desc = '\n'.join(chan.mention for chan in ctx.guild.channels if isinstance(chan, discord.TextChannel))
         embed = discord.Embed(type='rich', description=desc)
         await ctx.send(embed=embed)
