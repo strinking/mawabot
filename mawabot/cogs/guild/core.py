@@ -163,3 +163,12 @@ class Guild:
                 ))
                 embed = discord.Embed(type='rich', description=desc, color=role.color)
             await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.guild_only()
+    async def channels(self, ctx):
+        ''' Lists all channels in the current guild. '''
+
+        desc = '\n'.join(chan.mention for chan in ctx.guild.channels)
+        embed = discord.Embed(type='rich', description=desc)
+        await ctx.send(embed=embed)
