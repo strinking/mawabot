@@ -18,7 +18,7 @@ import discord
 from discord.ext import commands
 
 
-MAX_DELETE_POSTS = 30
+MAX_DELETE_POSTS = 80
 
 logger = logging.getLogger(__name__)
 
