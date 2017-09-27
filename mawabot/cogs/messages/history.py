@@ -72,6 +72,8 @@ class History:
 
         fut = ctx.message.delete()
         await self.bot._send(content=f'**{limit} messages from {ctx.channel.mention}:**')
+        await fut
+
         i = 0
         async for msg in ctx.channel.history(**params):
             if msg != ctx.message:
@@ -80,5 +82,4 @@ class History:
                 i += 1
                 # Note: not using enumerate() since it doesn't work with async-iterators
 
-        await self.bot._send(content=f'Done outputting messages from {ctx.channel.mention}')
-        await fut
+        await self.bot._send(content=f'Done running `{ctx.message.content}`')
