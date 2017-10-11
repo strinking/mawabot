@@ -12,7 +12,7 @@
 
 from .core import General
 from .dice import Dice
-from .math import Math
+from .calc import Calc
 
 __all__ = [
     'setup',
@@ -22,4 +22,4 @@ def setup(bot):
     ''' Setup function to add cog to bot '''
     bot.add_cog(General(bot))
     bot.add_cog(Dice(bot))
-    bot.add_cog(Math(bot))
+    bot.add_cog(Calc(bot))

@@ -20,10 +20,10 @@ from discord.ext import commands
 MATH_LOCALS = {name: getattr(math, name) for name in dir(math) if not name.startswith('_')}
 
 __all__ = [
-    'Math',
+    'Calc',
 ]
 
-class Math:
+class Calc:
     __slots__ = (
         'bot',
     )
