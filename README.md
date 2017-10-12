@@ -16,7 +16,7 @@ $ pip3 install -r requirements.txt
 ```
 
 ### Execution
-Store your configuration data in `config.json` and run:
+Create a configuration file (see the sample to get started) and run:
 ```
-$ python3 -m mawabot config.json
+$ python3 -m mawabot config.yaml
 ```

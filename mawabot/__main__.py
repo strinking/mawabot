@@ -18,8 +18,9 @@ Used to run the bot on it's own
 
 import argparse
 import logging
-import json
 import sys
+
+import yaml
 
 from . import client
 
@@ -70,9 +71,9 @@ if __name__ == '__main__':
 
     try:
         # Load config
-        with open(args.config_file, 'r') as jsonfile:
-            config = json.load(jsonfile)
-    except (json.decoder.JSONDecodeError, IOError) as err:
+        with open(args.config_file, 'r') as fh:
+            config = yaml.safe_load(fh)
+    except (yaml.YAMLError, IOError) as err:
         logger.error("Configuration file was invalid.")
         exit(1)
 
