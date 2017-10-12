@@ -125,6 +125,20 @@ class Meme:
 
         await ctx.message.edit(content='\n'.join(words))
 
+    @commands.command()
+    async def clap(self, ctx, *, text: str):
+        ''' Replaces spaces with the clap emoji 👏 '''
+
+        content = ' 👏 '.join(text.upper().split())
+        await ctx.message.edit(content=content)
+
+    @commands.command()
+    async def clap2(self, ctx, *, text: str):
+        ''' Clap variant that starts and ends with claps too '''
+
+        content = ''.join(f'👏 {word}' for word in text.upper().split())
+        await ctx.message.edit(content=content + ' 👏')
+
     def _cowsay(self, args, text):
         text = text.replace('\n', '\n\n').replace("```", "'''")
         args.append(text)
