@@ -1,0 +1,15 @@
+---
+
+# You need to get your user's token
+# See: https://github.com/TheRacingLion/Discord-SelfBot/wiki/Discord-Token-Tutorial
+token: 'your-bot-token-here'
+
+# The "output channel", used for dumping information
+# from certain commands. Set this to null to disable
+# dumping, or to a channel ID.
+#
+# Be warned this channel can and will get spammed!
+output-channel: ~
+
+# The prefix used by the selfbot
+prefix: .
