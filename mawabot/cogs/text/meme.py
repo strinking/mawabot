@@ -136,7 +136,7 @@ class Meme:
     async def clap2(self, ctx, *, text: str):
         ''' Clap variant that starts and ends with claps too '''
 
-        content = ''.join(map(lambda x: f'👏 {x}', text.upper().split()))
+        content = ''.join(f'👏 {word}' for word in text.upper().split())
         await ctx.message.edit(content=content + ' 👏')
 
     def _cowsay(self, args, text):
