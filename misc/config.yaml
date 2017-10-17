@@ -11,5 +11,8 @@ token: 'your-bot-token-here'
 # Be warned this channel can and will get spammed!
 output-channel: ~
 
+# The directory to download all files to
+download-dir: /tmp/mawabot
+
 # The prefix used by the selfbot
 prefix: .

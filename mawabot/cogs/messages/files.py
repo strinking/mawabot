@@ -14,8 +14,11 @@
 
 import asyncio
 import io
-import tarfile
+import os
 import re
+import tarfile
+import time
+import traceback
 from datetime import datetime
 
 import aiohttp
@@ -28,10 +31,13 @@ URL_FILENAME_REGEX = re.compile(r'^.*\/([^\/ ]+)$')
 class Files:
     __slots__ = (
         'bot',
+        'dir',
     )
 
     def __init__(self, bot):
         self.bot = bot
+        self.dir = self.bot.config['download-dir']
+        os.makedirs(self.dir, exist_ok=True)
 
     @commands.command()
     async def upload(self, ctx, *paths: str):
@@ -59,14 +65,43 @@ class Files:
         await ctx.send(**kwargs)
         await fut
 
-    async def _dl(self, url, fileobj):
-        async with aiohttp.request('GET', url) as req:
-            fileobj.write(await req.read())
+    @staticmethod
+    def _create_tarinfo(name, fileobj):
+        info = tarfile.TarInfo(name)
+        info.size = fileobj.getbuffer().nbytes
+        info.uid = os.geteuid()
+        info.gid = os.getegid()
+        info.mtime = time.time()
+        return info
+
+    async def _save(self, url, fileobj):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(url) as req:
+                fileobj.write(await req.read())
 
     @commands.command()
     async def dl(self, ctx, posts: int = 1):
         ''' Downloads the last X urls from the current channel '''
 
+        fut = ctx.message.delete()
+
+        try:
+            urls, tar_path = await self._dl(ctx, posts)
+        except:
+            embed = discord.Embed(type='rich', title='Download failed!')
+            embed.color = discord.Color.red()
+            embed.description = f'```py\n{traceback.format_exc()}\n```'
+            embed.timestamp = datetime.now()
+        else:
+            embed = discord.Embed(type='rich', title=f'Download complete!')
+            embed.color = discord.Color.green()
+            embed.description = f'Downloaded **{len(urls)} files** to `{tar_path}`'
+            embed.timestamp = datetime.now()
+
+        await self.bot._send(embed=embed)
+        await fut
+
+    async def _dl(self, ctx, posts):
         urls = []
         files = []
         futures = []
@@ -82,7 +117,7 @@ class Files:
                 urls.append(url)
                 fileobj = io.BytesIO()
                 files.append(fileobj)
-                futures.append(self._dl(url, fileobj))
+                futures.append(self._save(url, fileobj))
 
             # Attachments
             for attach in msg.attachments:
@@ -95,12 +130,12 @@ class Files:
         await asyncio.gather(*futures)
 
         # Add files to tar archive
-        tar_path = f'mawabot-dl-{ctx.message.id}.tar.gz'
+        tar_path = os.path.join(self.dir, f'mawabot-dl-{ctx.message.id}.tar.gz')
         with open(tar_path, 'wb') as fh:
             with tarfile.open(fileobj=fh, mode='x:gz') as tar:
                 # Add list of urls found
                 fileobj = io.BytesIO('\n'.join(urls).encode('utf-8'))
-                tarinfo = tar.gettarinfo(name='urls.txt', fileobj=fileobj)
+                tarinfo = self._create_tarinfo('urls.txt', fileobj)
                 tar.addfile(tarinfo, fileobj)
 
                 # Add downloaded files
@@ -111,11 +146,7 @@ class Files:
                     else:
                         name = f'{i}-{match[1]}'
 
-                    tarinfo = tar.gettarinfo(name=name, fileobj=fileobj)
+                    tarinfo = self._create_tarinfo(name, fileobj)
                     tar.addfile(tarinfo, fileobj)
 
-        # Announce that it's done
-        embed = discord.Embed(type='rich', title=f'Download for {ctx.message.id} complete!')
-        embed.timestamp = datetime.now()
-        embed.set_footer(name=f'{len(urls)} files downloaded')
-        await self.bot._send(embed=embed)
+        return urls, tar_path
