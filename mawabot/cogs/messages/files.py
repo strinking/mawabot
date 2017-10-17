@@ -13,10 +13,8 @@
 ''' Has commands related to file uploads and downloads '''
 
 import asyncio
-import io
 import os
 import re
-import tarfile
 import time
 import traceback
 from datetime import datetime
@@ -66,13 +64,14 @@ class Files:
         await fut
 
     @staticmethod
-    def _create_tarinfo(name, fileobj):
-        info = tarfile.TarInfo(name)
-        info.size = fileobj.getbuffer().nbytes
-        info.uid = os.geteuid()
-        info.gid = os.getegid()
-        info.mtime = time.time()
-        return info
+    def _get_path(dir_path, url, discrim):
+        match = URL_FILENAME_REGEX.match(urls[i])
+        if match is None:
+            name = f'{discrim}'
+        else:
+            name = f'{discrim}-{match[1]}'
+
+        return os.path.join(dir_path, name)
 
     async def _save(self, url, fileobj):
         async with aiohttp.ClientSession() as cs:
@@ -86,7 +85,7 @@ class Files:
         fut = ctx.message.delete()
 
         try:
-            urls, tar_path = await self._dl(ctx, posts)
+            urls, path = await self._dl(ctx, posts)
         except:
             embed = discord.Embed(type='rich', title='Download failed!')
             embed.color = discord.Color.red()
@@ -95,7 +94,7 @@ class Files:
         else:
             embed = discord.Embed(type='rich', title=f'Download complete!')
             embed.color = discord.Color.green()
-            embed.description = f'Downloaded **{len(urls)} files** to `{tar_path}`'
+            embed.description = f'Downloaded **{len(urls)} files** to `{path}`'
             embed.timestamp = datetime.now()
 
         await self.bot._send(embed=embed)
@@ -103,11 +102,12 @@ class Files:
 
     async def _dl(self, ctx, posts):
         urls = []
-        files = []
         futures = []
+        dir_path = os.path.join(self.dir, f'mawabot-dl-{ctx.message.id}')
 
         # Gather all items to download
         before = discord.utils.snowflake_time(ctx.message.id)
+        i = 0
         async for msg in ctx.channel.history(limit=posts + 1, before=before):
             if msg == ctx.message:
                 continue
@@ -115,38 +115,23 @@ class Files:
             # Links
             for url in URL_REGEX.findall(msg.content):
                 urls.append(url)
-                fileobj = io.BytesIO()
-                files.append(fileobj)
-                futures.append(self._save(url, fileobj))
+                path = self._get_path(dir_path, url, i)
+                i += 1
+
+                futures.append(self._save(url, ))
 
             # Attachments
             for attach in msg.attachments:
-                urls.append(attach.url)
-                fileobj = io.BytesIO()
-                files.append(fileobj)
-                futures.append(attach.save(fileobj))
+                path = os.path.join(dir_path, f'{i}-{attach.filename}')
+                i += 1
+
+                futures.append(attach.save(path))
+
+        # Save list of URLs
+        path = os.path.join(dir_path, 'urls.txt')
+        with open(path, 'w') as fh:
+            fh.writelines(urls)
 
         # Queue the downloads
         await asyncio.gather(*futures)
-
-        # Add files to tar archive
-        tar_path = os.path.join(self.dir, f'mawabot-dl-{ctx.message.id}.tar.gz')
-        with open(tar_path, 'wb') as fh:
-            with tarfile.open(fileobj=fh, mode='x:gz') as tar:
-                # Add list of urls found
-                fileobj = io.BytesIO('\n'.join(urls).encode('utf-8'))
-                tarinfo = self._create_tarinfo('urls.txt', fileobj)
-                tar.addfile(tarinfo, fileobj)
-
-                # Add downloaded files
-                for i, fileobj in enumerate(files):
-                    match = URL_FILENAME_REGEX.match(urls[i])
-                    if match is None:
-                        name = f'{i}'
-                    else:
-                        name = f'{i}-{match[1]}'
-
-                    tarinfo = self._create_tarinfo(name, fileobj)
-                    tar.addfile(tarinfo, fileobj)
-
-        return urls, tar_path
+        return urls, dir_path
