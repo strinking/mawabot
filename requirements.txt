@@ -1,4 +1,5 @@
 PyYAML>=3.0
+aiohttp>=2.2
 astral>=1.2
 ckuehl-upsidedown>=0.4
 psutil>=5.2
