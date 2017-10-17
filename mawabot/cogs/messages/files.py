@@ -65,7 +65,7 @@ class Files:
 
     @staticmethod
     def _get_path(dir_path, url, discrim):
-        match = URL_FILENAME_REGEX.match(urls[i])
+        match = URL_FILENAME_REGEX.match(url)
         if match is None:
             name = f'{discrim}'
         else:
@@ -73,10 +73,13 @@ class Files:
 
         return os.path.join(dir_path, name)
 
-    async def _save(self, url, fileobj):
+    async def _save(self, url, path):
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url) as req:
-                fileobj.write(await req.read())
+                data = await req.read()
+
+        with open(path, 'wb') as fh:
+            fh.write(data)
 
     @commands.command()
     async def dl(self, ctx, posts: int = 1):
@@ -103,7 +106,10 @@ class Files:
     async def _dl(self, ctx, posts):
         urls = []
         futures = []
+
+        # Create exclusive dir
         dir_path = os.path.join(self.dir, f'mawabot-dl-{ctx.message.id}')
+        os.mkdir(dir_path)
 
         # Gather all items to download
         before = discord.utils.snowflake_time(ctx.message.id)
@@ -118,7 +124,7 @@ class Files:
                 path = self._get_path(dir_path, url, i)
                 i += 1
 
-                futures.append(self._save(url, ))
+                futures.append(self._save(url, path))
 
             # Attachments
             for attach in msg.attachments:
