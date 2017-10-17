@@ -24,7 +24,7 @@ import discord
 from discord.ext import commands
 
 URL_REGEX = re.compile(r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)')
-URL_FILENAME_REGEX = re.compile(r'^.*\/([^\/ ]+)$')
+URL_FILENAME_REGEX = re.compile(r'^https?:\/\/.*\/([^\/ ]+)$')
 
 class Files:
     __slots__ = (
@@ -88,7 +88,7 @@ class Files:
         fut = ctx.message.delete()
 
         try:
-            urls, path = await self._dl(ctx, posts)
+            count, path = await self._dl(ctx, posts)
         except:
             embed = discord.Embed(type='rich', title='Download failed!')
             embed.color = discord.Color.red()
@@ -97,7 +97,7 @@ class Files:
         else:
             embed = discord.Embed(type='rich', title=f'Download complete!')
             embed.color = discord.Color.green()
-            embed.description = f'Downloaded **{len(urls)} files** to `{path}`'
+            embed.description = f'\U0001f4c1 Saved **{count} files** to `{path}`'
             embed.timestamp = datetime.now()
 
         await self.bot._send(embed=embed)
@@ -136,8 +136,8 @@ class Files:
         # Save list of URLs
         path = os.path.join(dir_path, 'urls.txt')
         with open(path, 'w') as fh:
-            fh.writelines(urls)
+            fh.write('\n'.join(urls))
 
         # Queue the downloads
         await asyncio.gather(*futures)
-        return urls, dir_path
+        return i, dir_path
