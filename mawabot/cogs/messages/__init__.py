@@ -11,9 +11,11 @@
 #
 
 from .core import Messages
+from .files import Files
 from .history import History
 
 def setup(bot):
     ''' Setup function to add cog to bot '''
     bot.add_cog(Messages(bot))
+    bot.add_cog(Files(bot))
     bot.add_cog(History(bot))
