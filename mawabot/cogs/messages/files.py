@@ -45,12 +45,7 @@ class Files:
             return
 
         fut = ctx.message.delete()
-        files = []
-        for path in files:
-            with open(path, 'rb') as fh:
-                data = fh.read()
-            files.append(io.BytesIO(data))
-
+        files = [discord.File(path) for path in paths]
         if len(files) == 1:
             kwargs = {
                 'file': files[0],
