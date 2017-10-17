@@ -15,7 +15,6 @@
 import asyncio
 import os
 import re
-import time
 import traceback
 from datetime import datetime
 
@@ -81,6 +80,9 @@ class Files:
         ''' Downloads the last X urls from the current channel '''
 
         fut = ctx.message.delete()
+
+        # For "embed.color"
+        # pylint: disable=assigning-non-slot
 
         try:
             count, path = await self._dl(ctx, posts)
