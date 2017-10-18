@@ -13,12 +13,6 @@ install:
 
 script:
   - pylint mawabot
-  - pylint mawabot/cogs/general
-  - pylint mawabot/cogs/guild
-  - pylint mawabot/cogs/info
-  - pylint mawabot/cogs/messages
-  - pylint mawabot/cogs/programming
-  - pylint mawabot/cogs/text
 
 notifications:
   email:
