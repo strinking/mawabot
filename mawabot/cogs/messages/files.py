@@ -40,6 +40,9 @@ class Files:
     async def upload(self, ctx, *paths: str):
         ''' Uploads the given files from your filesystem to this channel '''
 
+        # For "embed.color"
+        # pylint: disable=assigning-non-slot
+
         if not paths:
             return
 
