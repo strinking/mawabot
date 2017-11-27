@@ -65,7 +65,6 @@ class Files:
             embed.description = f'```py\n{traceback.format_exc()}\n```'
             embed.timestamp = datetime.now()
             await self.bot._send(embed=embed)
-
         await fut
 
     @staticmethod
@@ -90,8 +89,6 @@ class Files:
     async def download(self, ctx, posts: int = 1):
         ''' Downloads the last X urls from the current channel '''
 
-        fut = ctx.message.delete()
-
         # For "embed.color"
         # pylint: disable=assigning-non-slot
 
@@ -108,8 +105,10 @@ class Files:
             embed.description = f'\U0001f4c1 Saved **{count} files** to `{path}`'
             embed.timestamp = datetime.now()
 
-        await self.bot._send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.message.delete(),
+            self.bot._send(embed=embed),
+        )
 
     async def _download(self, ctx, posts):
         urls = []
