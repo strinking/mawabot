@@ -44,7 +44,7 @@ class Files:
             return
 
         fut = ctx.message.delete()
-        files = [discord.File(path) for path in paths]
+        files = [discord.File(path) for path in map(os.path.expanduser, paths)]
         if len(files) == 1:
             kwargs = {
                 'file': files[0],
@@ -54,7 +54,15 @@ class Files:
                 'files': files,
             }
 
-        await ctx.send(**kwargs)
+        try:
+            await ctx.send(**kwargs)
+        except:
+            embed = discord.Embed(type='rich', title='Upload failed!')
+            embed.color = discord.Color.red()
+            embed.description = f'```py\n{traceback.format_exc()}\n```'
+            embed.timestamp = datetime.now()
+            await self.bot._send(embed=embed)
+
         await fut
 
     @staticmethod
