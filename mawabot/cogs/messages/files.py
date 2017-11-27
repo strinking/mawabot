@@ -36,7 +36,7 @@ class Files:
         self.dir = self.bot.config['download-dir']
         os.makedirs(self.dir, exist_ok=True)
 
-    @commands.command()
+    @commands.command(name='upload', aliases=['up'])
     async def upload(self, ctx, *paths: str):
         ''' Uploads the given files from your filesystem to this channel '''
 
@@ -75,8 +75,8 @@ class Files:
         with open(path, 'wb') as fh:
             fh.write(data)
 
-    @commands.command()
-    async def dl(self, ctx, posts: int = 1):
+    @commands.command(name='download', aliases=['dl'])
+    async def download(self, ctx, posts: int = 1):
         ''' Downloads the last X urls from the current channel '''
 
         fut = ctx.message.delete()
@@ -85,7 +85,7 @@ class Files:
         # pylint: disable=assigning-non-slot
 
         try:
-            count, path = await self._dl(ctx, posts)
+            count, path = await self._download(ctx, posts)
         except:
             embed = discord.Embed(type='rich', title='Download failed!')
             embed.color = discord.Color.red()
@@ -100,7 +100,7 @@ class Files:
         await self.bot._send(embed=embed)
         await fut
 
-    async def _dl(self, ctx, posts):
+    async def _download(self, ctx, posts):
         urls = []
         futures = []
 
