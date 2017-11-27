@@ -11,7 +11,6 @@
 #
 
 ''' Has commands related to fetching channel history '''
-
 import asyncio
 
 import discord
@@ -70,16 +69,19 @@ class History:
             else:
                 raise ValueError(f"Unknown parameter: {param}")
 
-        fut = ctx.message.delete()
-        await self.bot._send(content=f'**{limit} messages from {ctx.channel.mention}:**')
-        await fut
+        await asyncio.gather(
+            self.bot._send(content=f'**{limit} messages from {ctx.channel.mention}:**'),
+            ctx.message.delete(),
+        )
 
         i = 0
+        # Note: not using enumerate() since it doesn't work with async-iterators
         async for msg in ctx.channel.history(**params):
             if msg != ctx.message:
-                await call(i, msg)
-                await asyncio.sleep(0.2)
+                await asyncio.gather(
+                    call(i, msg),
+                    asyncio.sleep(0.2),
+                )
                 i += 1
-                # Note: not using enumerate() since it doesn't work with async-iterators
 
         await self.bot._send(content=f'Done running `{ctx.message.content}`')

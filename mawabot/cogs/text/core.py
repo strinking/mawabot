@@ -11,6 +11,7 @@
 #
 
 ''' Has commands for text transformation '''
+import asyncio
 import codecs
 
 import upsidedown
@@ -33,7 +34,12 @@ class Text:
     async def sep(self, ctx, posts_back: int = 1):
         ''' Adds a separator between posts, X posts back '''
 
-        fut = ctx.message.delete()
+        asyncio.gather(
+            self._sep(ctx, posts_back),
+            ctx.message.delete(),
+        )
+
+    async def _sep(self, ctx, posts_back):
         count = 0
         async for msg in ctx.channel.history():
             if msg.author == self.bot.client:
@@ -42,10 +48,10 @@ class Text:
                     break
 
         assert msg.author == self.bot.client
+
         if not msg.content.startswith('.\n'):
             content = '.\n' + msg.content
             await msg.edit(content=content)
-        await fut
 
     @commands.command()
     async def upsidedown(self, ctx, *, text: str):

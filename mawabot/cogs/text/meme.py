@@ -11,7 +11,7 @@
 #
 
 ''' Has commands for meme-y text transformation '''
-
+import asyncio
 import random
 import re
 import subprocess
@@ -82,10 +82,11 @@ class Meme:
                 return s
             return '\u200b'.join(self.regional_emojis.get(c.lower(), c) for c in s)
 
-        fut = ctx.message.delete()
         content = ''.join(map(mapper, DISCORD_STRINGS.split(text)))
-        await ctx.send(content=content)
-        await fut
+        await asyncio.gather(
+            ctx.send(content=content),
+            ctx.message.delete(),
+        )
 
     @commands.command()
     async def sw(self, ctx, *, text: str):

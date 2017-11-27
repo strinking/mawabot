@@ -11,6 +11,7 @@
 #
 
 ''' Has general or miscellaneous commands '''
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -45,8 +46,10 @@ class General:
         else:
             content = 'Removed nickname'
 
-        await ctx.guild.me.edit(nick=nickname)
-        await ctx.send(content=content)
+        await asyncio.gather(
+            ctx.guild.me.edit(nick=nickname),
+            ctx.send(content=content),
+        )
 
     @commands.command()
     async def playing(self, ctx, *, playing: str = None):
@@ -59,8 +62,10 @@ class General:
             game = None
             content = f'Unset game'
 
-        await self.bot.change_presence(game=game)
-        await ctx.message.edit(content=content)
+        await asyncio.gather(
+            self.bot.change_presence(game=game),
+            ctx.message.edit(content=content),
+        )
 
     def _get_user_mention(self, name):
         if name.isdigit():
@@ -78,11 +83,12 @@ class General:
         if not names:
             return
 
-        fut = ctx.message.delete()
         desc = '\n\n'.join(map(self._get_user_mention, names))
         embed = discord.Embed(type='rich', description=desc)
-        await ctx.send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.send(embed=embed),
+            ctx.message.delete(),
+        )
 
     def _get_channel_mention(self, name, guild=None):
         if name.isdigit():
@@ -101,11 +107,12 @@ class General:
         if not names:
             return
 
-        fut = ctx.message.delete()
         desc = '\n\n'.join(self._get_channel_mention(name, ctx.guild) for name in names)
         embed = discord.Embed(type='rich', description=desc)
-        await ctx.send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.send(embed=embed),
+            ctx.message.delete(),
+        )
 
     def _get_role_mention(self, guild, name):
         if name.isdigit():
@@ -124,8 +131,9 @@ class General:
         if not names:
             return
 
-        fut = ctx.message.delete()
         desc = '\n\n'.join(self._get_role_mention(ctx.guild, name) for name in names)
         embed = discord.Embed(type='rich', description=desc)
-        await ctx.send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.send(embed=embed),
+            ctx.message.delete(),
+        )

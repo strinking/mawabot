@@ -11,8 +11,11 @@
 #
 
 ''' Has commands for programming '''
+import asyncio
 import logging
 import subprocess
+import traceback
+from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -59,14 +62,15 @@ class Programming:
         logger.info(f'Evaluating python: "{expr}"')
         embed = discord.Embed(type='rich')
         embed.set_author(name=expr)
+        embed.timestamp = datetime.now()
         try:
             # pylint: disable=eval-used
             result = eval(expr)
             embed.color = discord.Color.teal()
             embed.description = f'`{result!r}`'
-        except Exception as ex:
+        except Exception:
             embed.color = discord.Color.red()
-            embed.description = f'{ex.__class__.__name__}: {ex}'
+            embed.description = f'```py\n{traceback.format_exc()}\n```'
 
         await ctx.send(embed=embed)
 
@@ -102,7 +106,6 @@ class Programming:
     async def sh(self, ctx, *, command: str):
         ''' Evaluates an arbitrary shell command '''
 
-        fut = ctx.message.delete()
         result = subprocess.run(command, shell=True, timeout=3,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -118,8 +121,10 @@ class Programming:
         if result.stderr:
             embed.add_field(name='stderr', value=self._get_text(result.stderr))
 
-        await ctx.send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.send(embed=embed),
+            ctx.message.delete(),
+        )
 
     @commands.command()
     async def sh2(self, ctx, *, command: str):
