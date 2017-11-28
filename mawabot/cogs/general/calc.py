@@ -11,7 +11,7 @@
 #
 
 ''' Holds commands related to mathematics '''
-
+import asyncio
 import math
 
 import discord
@@ -35,7 +35,6 @@ class Calc:
     async def calc(self, ctx, *, expr: str = '(nothing)'):
         ''' Evaluates a mathematical expression and prints the result '''
 
-        fut = ctx.message.delete()
         embed = discord.Embed(type='rich')
         embed.set_author(name='Calculator:')
         lines = [
@@ -61,5 +60,7 @@ class Calc:
             embed.color = discord.Color.red()
 
         embed.description = '\n'.join(lines)
-        await ctx.send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.send(embed=embed),
+            ctx.message.delete(),
+        )

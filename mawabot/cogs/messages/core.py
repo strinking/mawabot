@@ -49,18 +49,25 @@ class Messages:
     async def hit(self, ctx, *, content: str = None):
         ''' Sends the given message and then immediately deletes it '''
 
-        fut = ctx.message.delete()
+        await asyncio.gather(
+            self._hit(ctx, content),
+            ctx.message.delete(),
+        )
+
+    @staticmethod
+    async def _hit(ctx, content):
         if content is not None:
             await ctx.send(content=content, delete_after=0)
-        await fut
 
     @commands.command()
     async def delay(self, ctx, seconds: float, *, content: str):
         ''' Sends the given message after the specified number of seconds '''
 
         logger.info(f'Queued up delayed message for {seconds} seconds from now')
-        await ctx.message.delete()
-        await asyncio.sleep(seconds)
+        await asyncio.gather(
+            asyncio.sleep(seconds),
+            ctx.message.delete(),
+        )
         logger.info(f'Posting delayed message: {content}')
         await ctx.send(content=content)
 
@@ -68,16 +75,17 @@ class Messages:
     async def embed(self, ctx, *, content: str):
         ''' Inserts the given message into an embed. '''
 
-        fut = ctx.message.delete()
         embed = discord.Embed(type='rich', description=content)
-        await ctx.send(embed=embed)
-        await fut
+        await asyncio.gather(
+            ctx.send(embed=embed),
+            ctx.message.delete(),
+        )
 
     @commands.command()
     async def quote(self, ctx, id: int, cid: int = 0):
         ''' Quotes the given post(s) '''
 
-        fut = ctx.message.delete()
+        tasks = [ctx.message.delete()]
         if cid:
             channel = self.bot.get_channel(cid)
             if channel is None:
@@ -85,7 +93,6 @@ class Messages:
                 return
         else:
             channel = ctx.channel
-        await fut
 
         to_quote = await self._get_messages(channel, (id,))
         for msg in to_quote:
@@ -96,13 +103,14 @@ class Messages:
             if msg.attachments:
                 urls = '\n'.join(attach.url for attach in msg.attachments)
                 embed.add_field(name='Attachments:', value=urls)
-            await ctx.send(embed=embed)
+            tasks.append(ctx.send(embed=embed))
+        await asyncio.gather(*tasks)
 
     @commands.command()
     async def dump(self, ctx, *ids: int):
         ''' Outputs the literal contents of the given post(s) '''
 
-        fut = ctx.message.delete()
+        tasks = [ctx.message.delete()]
         to_copy = await self._get_messages(ctx.channel, ids)
         for msg in to_copy:
             if msg.content:
@@ -127,12 +135,9 @@ class Messages:
             if msg.attachments:
                 urls = '\n'.join(attach.url for attach in msg.attachments)
                 embed.add_field(name='Attachments:', value=urls)
-            await self.bot._send(embed=embed)
-
-            for embed in msg.embeds:
-                await self.bot._send(embed=embed)
-
-        await fut
+            tasks.append(self.bot._send(embed=embed))
+            tasks += [self.bot._send(embed=embed) for embed in msg.embeds]
+        await asyncio.gather(*tasks)
 
     @commands.command()
     async def delet(self, ctx, posts: int = 1):
@@ -143,16 +148,16 @@ class Messages:
                           f'the self-imposed limit of {MAX_DELETE_POSTS}'))
             return
 
-        fut = ctx.message.delete()
+        tasks = [ctx.message.delete()]
         deleted = 0
         async for msg in ctx.channel.history():
             if msg.author == self.bot.user:
-                await msg.delete()
+                tasks.append(msg.delete())
                 deleted += 1
                 if deleted >= posts + 1:
                     break
 
-        await fut
+        await asyncio.gather(*tasks)
 
     @commands.command()
     async def purge(self, ctx, posts: int = 1):
@@ -163,8 +168,8 @@ class Messages:
                           f'the self-imposed limit of {MAX_DELETE_POSTS}'))
             return
 
+        tasks = []
         async for msg in ctx.channel.history(limit=posts + 1):
-            try:
-                await msg.delete()
-            except discord.errors.DiscordException as ex:
-                logger.error(f'Cannot delete message {msg.id}: {ex}')
+            tasks.append(msg.delete())
+
+        await asyncio.gather(*tasks)
