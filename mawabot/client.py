@@ -58,6 +58,7 @@ class Bot(commands.Bot):
         if not self.config['token']:
             err_msg = 'Token is empty. Please open the config file and add your token!'
             logger.critical(err_msg)
+            raise ValueError("Token is empty")
         else:
             return self.run(self.config['token'], bot=False)
 

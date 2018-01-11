@@ -104,7 +104,7 @@ class Messages:
                 urls = '\n'.join(attach.url for attach in msg.attachments)
                 embed.add_field(name='Attachments:', value=urls)
             tasks.append(ctx.send(embed=embed))
-            tasks.append(self._send(embed=embed))
+            tasks.append(self.bot._send(embed=embed))
         await asyncio.gather(*tasks)
 
     @commands.command()
