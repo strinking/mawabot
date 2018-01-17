@@ -5,6 +5,12 @@
 __pycache__
 *.py[cdo]
 
+# venv
+/venv
+
+# vscode
+/.vscode
+
 # Logging
 *.log
 

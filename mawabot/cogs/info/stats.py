@@ -63,7 +63,8 @@ class Stats:
         desc = [f'Uptime: `{uptime}`',
                 f'Guilds: `{len(self.bot.guilds)}`',
                 f'Channels: `{channels}`',
-                f'Users: `{len(self.bot.users)}`',]
+                f'Users: `{len(self.bot.users)}`',
+                f'Latency: `{self.bot.latency}s`',]
 
         embed = discord.Embed(title='mawabot', url=GITHUB_URL, description='\n'.join(desc))
         git = []
