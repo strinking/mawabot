@@ -12,6 +12,7 @@
 
 ''' Has general or miscellaneous commands '''
 import asyncio
+from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -34,7 +35,9 @@ class General:
     async def ping(self, ctx):
         ''' Pong '''
 
-        await ctx.message.edit(content='Pong!')
+        delta = datetime.utcnow() - discord.utils.snowflake_time(ctx.message.id)
+        delay = delta.seconds * 1000 + delta.microseconds / 1000
+        await ctx.message.edit(content=f'**Pong!** ({delay} ms)')
 
     @commands.command()
     @commands.guild_only()
