@@ -16,6 +16,7 @@ import random
 import re
 import subprocess
 
+import discord
 from discord.ext import commands
 
 __all__ = [
@@ -73,8 +74,8 @@ class Meme:
             '?': '\N{BLACK QUESTION MARK ORNAMENT}',
         }
 
-    @commands.command()
-    async def ri(self, ctx, *, text: str):
+    @commands.command(aliaes=['ri'])
+    async def regionalindicators(self, ctx, *, text: str):
         ''' Makes the whole message into regional_indicator emojis '''
 
         def mapper(s):
@@ -88,15 +89,15 @@ class Meme:
             ctx.message.delete(),
         )
 
-    @commands.command()
-    async def sw(self, ctx, *, text: str):
+    @commands.command(aliases=['sw'])
+    async def spacewords(self, ctx, *, text: str):
         ''' Spaces out words '''
 
         content = ' . '.join(' '.join(word) for word in text.split(' '))
         await ctx.message.edit(content=content)
 
-    @commands.command()
-    async def cw(self, ctx, *, text: str):
+    @commands.command(aliases=['cw'])
+    async def crossword(self, ctx, *, text: str):
         ''' "Crossword"-ifys the given text '''
 
         text = text.upper()
@@ -140,7 +141,8 @@ class Meme:
         content = ''.join(f'👏 {word}' for word in text.upper().split())
         await ctx.message.edit(content=content + ' 👏')
 
-    def _cowsay(self, args, text):
+    @staticmethod
+    def _cowsay(args, text):
         text = text.replace('\n', '\n\n').replace("```", "'''")
         args.append(text)
         output = subprocess.check_output(args, stderr=subprocess.DEVNULL, timeout=0.5)
@@ -168,3 +170,17 @@ class Meme:
         ''' Replaces the given text with the given cow file '''
         content = self._cowsay(['cowsay', '-f', cowfile], text)
         await ctx.message.edit(content=content)
+
+    @staticmethod
+    async def _ohno(sendable):
+        ''' oh no. '''
+        url = f"https://www.raylu.net/f/ohno/ohno{random.randint(1, 53)}.png"
+        embed = discord.Embed().set_image(url=url)
+        await sendable.send(embed=embed)
+
+    @commands.command()
+    async def ohno(self, ctx):
+        await asyncio.gather(
+            self._ohno(ctx),
+            ctx.message.delete(),
+        )
