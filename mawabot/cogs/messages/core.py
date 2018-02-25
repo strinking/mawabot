@@ -140,8 +140,8 @@ class Messages:
             tasks += [self.bot._send(embed=embed) for embed in msg.embeds]
         await asyncio.gather(*tasks)
 
-    @commands.command()
-    async def delet(self, ctx, posts: int = 1):
+    @commands.command(aliases=['delet'])
+    async def delete(self, ctx, posts: int = 1):
         ''' Deletes the last X posts you made, including the trigger '''
 
         if posts > MAX_DELETE_POSTS:
