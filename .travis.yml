@@ -3,7 +3,8 @@ dist: trusty
 
 python:
   - '3.6'
-  - 'nightly'
+  - '3.6-dev'
+  - '3.7-dev'
 
 sudo: false
 
