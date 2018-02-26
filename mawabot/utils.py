@@ -105,7 +105,7 @@ class Reloader:
             await ctx.send(embed=embed)
     
     @commands.command()
-    async def listcogs(self, ctx):
+    async def cogs(self, ctx):
         '''
         List the cogs that are currently loaded
         '''
