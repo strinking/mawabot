@@ -30,8 +30,8 @@ class Text:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def sep(self, ctx, posts_back: int = 1):
+    @commands.command(aliases=['sep'])
+    async def separator(self, ctx, posts_back: int = 1):
         ''' Adds a separator between posts, X posts back '''
 
         asyncio.gather(
@@ -53,7 +53,7 @@ class Text:
             content = '.\n' + msg.content
             await msg.edit(content=content)
 
-    @commands.command()
+    @commands.command(aliases=['ud'])
     async def upsidedown(self, ctx, *, text: str):
         ''' Prints the given text upside down '''
 
@@ -67,8 +67,8 @@ class Text:
         result = codecs.encode(text, 'rot_13')
         await ctx.message.edit(content=result)
 
-    @commands.command()
-    async def rev(self, ctx, *, text: str):
+    @commands.command(aliases=['rev'])
+    async def reverse(self, ctx, *, text: str):
         ''' Reverses the text given '''
 
         await ctx.message.edit(content=text[::-1])
