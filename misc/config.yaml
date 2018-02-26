@@ -16,3 +16,8 @@ download-dir: /tmp/mawabot
 
 # The prefix used by the selfbot
 prefix: .
+
+# Authorization for Reddit extensions
+# To disable, do "reddit: ~"
+reddit:
+  token: 'reddit-token-here'
