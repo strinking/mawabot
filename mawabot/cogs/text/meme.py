@@ -12,6 +12,7 @@
 
 ''' Has commands for meme-y text transformation '''
 import asyncio
+import logging
 import random
 import re
 import subprocess
@@ -25,14 +26,18 @@ __all__ = [
 
 DISCORD_STRINGS = re.compile(r'(<\S*>)')
 
+logger = logging.getLogger(__name__)
+
 class Meme:
     __slots__ = (
         'bot',
+        'recent_messages',
         'regional_emojis',
     )
 
     def __init__(self, bot):
         self.bot = bot
+        self.recent_messages = set()
         self.regional_emojis = {
             'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}',
             'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}',
@@ -73,6 +78,22 @@ class Meme:
             '!': '\N{HEAVY EXCLAMATION MARK SYMBOL}',
             '?': '\N{BLACK QUESTION MARK ORNAMENT}',
         }
+
+        self.bot.add_listener(self.on_message)
+
+    async def on_message(self, message):
+        ''' Handling for text-based messages '''
+
+        if message.id in self.recent_messages:
+            return
+        else:
+            self.recent_messages.add(message.id)
+            if len(self.recent_messages) > 10:
+                self.recent_messages.pop()
+
+        if message.author == message.guild.me and message.content == 'oh no.':
+            logger.info(f"Sending 'oh no.' for {message.id} (#{message.channel.name})")
+            await self._ohno(message.channel)
 
     @commands.command(aliaes=['ri'])
     async def regionalindicators(self, ctx, *, text: str):
@@ -174,12 +195,13 @@ class Meme:
     @staticmethod
     async def _ohno(sendable):
         ''' oh no. '''
-        url = f"https://www.raylu.net/f/ohno/ohno{random.randint(1, 53)}.png"
+        url = f'https://www.raylu.net/f/ohno/ohno{random.randint(1, 53)}.png'
         embed = discord.Embed().set_image(url=url)
         await sendable.send(embed=embed)
 
     @commands.command()
     async def ohno(self, ctx):
+        ''' Bot command /ohno '''
         await asyncio.gather(
             self._ohno(ctx),
             ctx.message.delete(),
