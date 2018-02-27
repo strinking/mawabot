@@ -91,8 +91,8 @@ class Meme:
             if len(self.recent_messages) > 10:
                 self.recent_messages.pop()
 
-        if message.author == message.guild.me and message.content == 'oh no.':
-            logger.info(f"Sending 'oh no.' for {message.id} (#{message.channel.name})")
+        if message.author == self.bot.user and message.content == 'oh no.':
+            logger.info(f"Sending 'oh no.' for {message.id}")
             await self._ohno(message.channel)
 
     @commands.command(aliaes=['ri'])
