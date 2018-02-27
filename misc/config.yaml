@@ -20,4 +20,5 @@ prefix: .
 # Authorization for Reddit extensions
 # To disable, do "reddit: ~"
 reddit:
-  token: 'reddit-token-here'
+  app-id: 'application-id-here'
+  app-secret: 'application-secret-here'
