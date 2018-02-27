@@ -110,17 +110,16 @@ class Reloader:
         List the cogs that are currently loaded
         '''
 
-        msg = '```yaml\nCogs Loaded:\n'
+        lines = ['```yaml\nCogs Loaded:']
 
         if self.bot.cogs:
-            for cog in self.bot.cogs:
-                msg += f' - {cog}\n'
+            lines.extend(f' - {cog}' for cog in self.bot.cogs)
         else:
-            msg += ' - None\n'
+            lines.append(' - None')
 
-        msg += '```'
+        lines.append('```')
 
-        await ctx.message.edit(content=msg)
+        await ctx.message.edit(content='\n'.join(lines))
 
 def normalize_caseless(s):
     return unicodedata.normalize('NFKD', s.casefold())
