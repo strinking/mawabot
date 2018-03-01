@@ -103,7 +103,7 @@ class Reloader:
             embed = discord.Embed(color=discord.Color.green(), description=f'```{cogname}```')
             embed.set_author(name='Reloaded')
             await ctx.send(embed=embed)
-    
+
     @commands.command()
     async def cogs(self, ctx):
         '''
