@@ -12,6 +12,7 @@
 
 ''' Has several commands that deal with messages '''
 import asyncio
+import json
 import logging
 
 import discord
@@ -75,7 +76,12 @@ class Messages:
     async def embed(self, ctx, *, content: str):
         ''' Inserts the given message into an embed. '''
 
-        embed = discord.Embed(type='rich', description=content)
+        try:
+            args = json.loads(content)
+            embed = discord.Embed(**args)
+        except:
+            embed = discord.Embed(type='rich', description=content)
+
         await asyncio.gather(
             ctx.send(embed=embed),
             ctx.message.delete(),
