@@ -104,5 +104,22 @@ class Reloader:
             embed.set_author(name='Reloaded')
             await ctx.send(embed=embed)
 
+    @commands.command()
+    async def cogs(self, ctx):
+        '''
+        List the cogs that are currently loaded
+        '''
+
+        lines = ['```yaml\nCogs Loaded:']
+
+        if self.bot.cogs:
+            lines.extend(f' - {cog}' for cog in self.bot.cogs)
+        else:
+            lines.append(' - None')
+
+        lines.append('```')
+
+        await ctx.message.edit(content='\n'.join(lines))
+
 def normalize_caseless(s):
     return unicodedata.normalize('NFKD', s.casefold())
