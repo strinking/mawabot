@@ -39,66 +39,147 @@ class Reddit:
     __slots__ = (
         'bot',
         'token',
+        'session',
     )
 
     def __init__(self, bot):
         self.bot = bot
         self.token = None
+        self.session = aiohttp.ClientSession()
+    
+    def __unload(self):
+        self.session.close()
 
     def _headers(self):
         assert self.token
         return {'Authorization': f'bearer {self.token}',
-                'User-Agent': 'mawabot/1 by aismallard'}
+                'User-Agent': 'mawabot/1 by aismallard & maware'}
 
-    async def request(self, session, path):
+    async def request(self, path):
         url = 'https://oauth.reddit.com' + path
         logger.debug(f'Fetching reddit resource: {url}')
 
         if self.token is None:
-            await self.refresh_token(session)
+            await self.refresh_token()
 
-        async with session.get(url, headers=self._headers()) as req:
+        async with self.session.get(url, headers=self._headers()) as req:
             if req.status == 401:
                 logger.debug('Reddit token out of date, refreshing...')
-                await self.refresh_token(session)
+                await self.refresh_token()
 
                 # Try again with new token
-                async with session.get(url, headers=self._headers()) as req:
+                async with self.session.get(url, headers=self._headers()) as req:
                     req.raise_for_status()
                     data = await req.json()
             else:
-                print(req)
                 req.raise_for_status()
                 data = await req.json()
 
         return data
 
-    async def refresh_token(self, session):
+    async def refresh_token(self,):
         logger.info('Getting new Reddit token')
         reddit = self.bot.config['reddit']
-        async with session.post('https://www.reddit.com/api/v1/access_token',
-                                auth=aiohttp.BasicAuth(reddit['api-id'], reddit['api-secret']),
-                                data={'grant_type': 'client_credentials'}) as req:
+        async with self.session.post('https://www.reddit.com/api/v1/access_token',
+                                    auth=aiohttp.BasicAuth(reddit['app-id'], reddit['app-secret']),
+                                    data={'grant_type': 'client_credentials'}) as req:
             req.raise_for_status()
             data = await req.json()
             self.token = data['access_token']
 
-    @commands.command()
-    @check_reddit
-    async def headpat(self, ctx):
-        async with aiohttp.ClientSession() as cs:
-            items = await self.request(cs, '/r/headpats/random')
-            item = items[0]['data']['children'][0]['data']
+    def get_image(self, item, channel):
+        # Check if nsfw images is given and channel is a nsfw channel
+        nsfw = item['over_18']
 
-        resolutions = item['preview']['images'][0]['resolutions']
-        image = resolutions[1]
-        image_url = image['url'].replace('&amp;', '&')
-
+        if not nsfw:
+            resolutions = item['preview']['images'][0]['resolutions']
+            image = resolutions[1]
+            image['url'] = image['url'].replace('&amp;', '&')
+        else:
+            if channel.is_nsfw():
+                resolutions = item['preview']['images'][0]['resolutions']
+                image = resolutions[1]
+                image['url'] = image['url'].replace('&amp;', '&')
+            else:
+                return None
+        
         embed = discord.Embed()
         embed.title = item['title']
         embed.url = 'https://www.reddit.com/' + item['permalink']
-        embed.set_image(url=image_url)
+        embed.set_image(url=image['url'])
         embed.image.width = image['width']
         embed.image.height = image['height']
 
-        await ctx.send(embed=embed)
+        return embed
+    
+    @commands.command()
+    @check_reddit
+    async def headpat(self, ctx):
+        items = await self.request('/r/headpats/random')
+        item = items[0]['data']['children'][0]['data']
+        
+        # If the image is nsfw and the channel isn't set as nsfw image is none
+        image = self.get_image(item, ctx.channel)
+
+        if image is not None:
+            await ctx.send(embed=image)
+        else:
+            # Retry once more incase it was just that one
+
+            items = await self.request('/r/headpats/random')
+            item = items[0]['data']['children'][0]['data']
+        
+            image = self.get_image(item, ctx.channel)
+
+            if image is not None:
+                await ctx.send(embed=image)
+            else:
+                await ctx.message.add_reaction('🔞')
+    
+    @commands.command()
+    @check_reddit
+    async def megane(self, ctx):
+        items = await self.request('/r/megane/random')
+        item = items[0]['data']['children'][0]['data']
+        
+        # If the image is nsfw and the channel isn't set as nsfw image is none
+        image = self.get_image(item, ctx.channel)
+
+        if image is not None:
+            await ctx.send(embed=image)
+        else:
+            # Retry once more incase it was just that one
+
+            items = await self.request('/r/megane/random')
+            item = items[0]['data']['children'][0]['data']
+        
+            image = self.get_image(item, ctx.channel)
+
+            if image is not None:
+                await ctx.send(embed=image)
+            else:
+                await ctx.message.add_reaction('🔞')
+    
+    @commands.command()
+    @check_reddit
+    async def hentai(self, ctx):
+        items = await self.request('/r/hentai/random')
+        item = items[0]['data']['children'][0]['data']
+        
+        # If the image is nsfw and the channel isn't set as nsfw image is none
+        image = self.get_image(item, ctx.channel)
+
+        if image is not None:
+            await ctx.send(embed=image)
+        else:
+            # Retry once more incase it was just that one
+
+            items = await self.request('/r/hentai/random')
+            item = items[0]['data']['children'][0]['data']
+        
+            image = self.get_image(item, ctx.channel)
+
+            if image is not None:
+                await ctx.send(embed=image)
+            else:
+                await ctx.message.add_reaction('🔞')
