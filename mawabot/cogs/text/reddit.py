@@ -96,7 +96,7 @@ class Reddit:
             image = resolutions[1]
             image['url'] = image['url'].replace('&amp;', '&')
         else:
-            if channel.is_nsfw():
+            if isinstance(channel, discord.abc.PrivateChannel) or channel.is_nsfw():
                 resolutions = item['preview']['images'][0]['resolutions']
                 image = resolutions[1]
                 image['url'] = image['url'].replace('&amp;', '&')
