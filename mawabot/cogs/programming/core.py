@@ -13,6 +13,7 @@
 ''' Has commands for programming '''
 import asyncio
 import logging
+import re
 import subprocess
 import traceback
 from datetime import datetime
@@ -20,9 +21,13 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
+from mawabot.utils import Wrapper
+
 __all__ = [
     'Programming',
 ]
+
+PYTHON_CODE_REGEX = re.compile(r'\s*```(\w*)\n(.*)\n```\s*', re.DOTALL)
 
 logger = logging.getLogger(__file__)
 
@@ -73,6 +78,30 @@ class Programming:
             embed.description = f'```py\n{traceback.format_exc()}\n```'
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def call(self, ctx, *, code: str):
+        ''' Evaluates the Python code, running an async function called "run" '''
+
+        match = PYTHON_CODE_REGEX.match(code)
+        if match is not None:
+            code = match[2]
+
+        wrapper = Wrapper()
+        code += '\n__wrapper.item = run'
+        scope = locals()
+        scope.update({
+            'asyncio': asyncio,
+            'bot': self.bot,
+            'ctx': ctx,
+            'discord': discord,
+            'self': self,
+            '__wrapper': wrapper,
+        })
+
+        # pylint: disable=exec-used
+        exec(code, scope)
+        await wrapper.item()
 
     @staticmethod
     def _get_text(binary):

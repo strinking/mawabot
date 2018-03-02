@@ -22,10 +22,14 @@ COGS_DIR = 'mawabot.cogs.'
 
 __all__ = [
     'Reloader',
+    'Wrapper',
     'normalize_caseless',
 ]
 
 class Reloader:
+    __slots__ = (
+        'bot',
+    )
 
     def __init__(self, bot):
         self.bot = bot
@@ -120,6 +124,14 @@ class Reloader:
         lines.append('```')
 
         await ctx.message.edit(content='\n'.join(lines))
+
+class Wrapper:
+    __slots__ = (
+        'item',
+    )
+
+    def __init__(self, item=None):
+        self.item = item
 
 def normalize_caseless(s):
     return unicodedata.normalize('NFKD', s.casefold())
