@@ -55,6 +55,25 @@ class Reddit:
         return {'Authorization': f'bearer {self.token}',
                 'User-Agent': 'mawabot/1 by aismallard & maware'}
 
+    def _proxy(self):
+        reddit = self.bot.config['reddit']
+
+        proxy = reddit['proxy']
+        if proxy is None:
+            logging.debug("Not using a proxy")
+            return {}
+
+        logging.debug(f"Using proxy: {proxy}")
+        proxy_auth = reddit['proxy-auth']
+        if proxy_auth is not None:
+            logging.debug("Proxy basic authentication specified")
+            proxy_auth = aiohttp.BasicAuth(proxy_auth['user'], proxy_auth['password'])
+
+        return {
+            'proxy': proxy,
+            'proxy_auth': proxy_auth,
+        }
+
     async def request(self, path):
         url = 'https://oauth.reddit.com' + path
         logger.debug(f'Fetching reddit resource: {url}')
@@ -62,7 +81,7 @@ class Reddit:
         if self.token is None:
             await self.refresh_token()
 
-        async with self.session.get(url, headers=self._headers()) as req:
+        async with self.session.get(url, headers=self._headers(), **self._proxy()) as req:
             if req.status == 401:
                 logger.debug('Reddit token out of date, refreshing...')
                 await self.refresh_token()
@@ -82,7 +101,8 @@ class Reddit:
         reddit = self.bot.config['reddit']
         async with self.session.post('https://www.reddit.com/api/v1/access_token',
                                     auth=aiohttp.BasicAuth(reddit['app-id'], reddit['app-secret']),
-                                    data={'grant_type': 'client_credentials'}) as req:
+                                    data={'grant_type': 'client_credentials'},
+                                    **self._proxy()) as req:
             req.raise_for_status()
             data = await req.json()
             self.token = data['access_token']

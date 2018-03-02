@@ -22,3 +22,14 @@ prefix: .
 reddit:
   app-id: 'application-id-here'
   app-secret: 'application-secret-here'
+
+  # To use a proxy
+  proxy: http://proxy.example.org/
+  proxy-auth:
+    # This can be set to null if no authorization is needed
+    user: test
+    password: password
+
+  # To use system (default) proxy
+  proxy: ~
+  proxy-auth: ~
