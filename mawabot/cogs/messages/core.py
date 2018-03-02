@@ -18,7 +18,6 @@ import logging
 import discord
 from discord.ext import commands
 
-
 MAX_DELETE_POSTS = 80
 
 logger = logging.getLogger(__name__)
@@ -86,32 +85,6 @@ class Messages:
             ctx.send(embed=embed),
             ctx.message.delete(),
         )
-
-    @commands.command()
-    async def quote(self, ctx, id: int, cid: int = 0):
-        ''' Quotes the given post(s) '''
-
-        tasks = [ctx.message.delete()]
-        if cid:
-            channel = self.bot.get_channel(cid)
-            if channel is None:
-                logger.warning(f'Cannot find the channel with ID {cid}')
-                return
-        else:
-            channel = ctx.channel
-
-        to_quote = await self._get_messages(channel, (id,))
-        for msg in to_quote:
-            embed = discord.Embed(type='rich', description=msg.content)
-            embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
-            embed.timestamp = msg.created_at
-
-            if msg.attachments:
-                urls = '\n'.join(attach.url for attach in msg.attachments)
-                embed.add_field(name='Attachments:', value=urls)
-            tasks.append(ctx.send(embed=embed))
-            tasks.append(self.bot._send(embed=embed))
-        await asyncio.gather(*tasks)
 
     @commands.command()
     async def dump(self, ctx, *ids: int):
