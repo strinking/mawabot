@@ -46,7 +46,7 @@ class Reddit:
         self.bot = bot
         self.token = None
         self.session = aiohttp.ClientSession()
-    
+
     def __unload(self):
         self.session.close()
 
@@ -87,22 +87,15 @@ class Reddit:
             data = await req.json()
             self.token = data['access_token']
 
-    def get_image(self, item, channel):
+    @staticmethod
+    def get_image(item, channel):
         # Check if nsfw images is given and channel is a nsfw channel
         nsfw = item['over_18']
 
-        if not nsfw:
-            resolutions = item['preview']['images'][0]['resolutions']
-            image = resolutions[1]
-            image['url'] = image['url'].replace('&amp;', '&')
-        else:
-            if isinstance(channel, discord.abc.PrivateChannel) or channel.is_nsfw():
-                resolutions = item['preview']['images'][0]['resolutions']
-                image = resolutions[1]
-                image['url'] = image['url'].replace('&amp;', '&')
-            else:
-                return None
-        
+        resolutions = item['preview']['images'][0]['resolutions']
+        image = resolutions[1]
+        image['url'] = image['url'].replace('&amp;', '&')
+
         embed = discord.Embed()
         embed.title = item['title']
         embed.url = 'https://www.reddit.com/' + item['permalink']
@@ -110,76 +103,43 @@ class Reddit:
         embed.image.width = image['width']
         embed.image.height = image['height']
 
-        return embed
-    
+        if nsfw:
+            safe = isinstance(channel, discord.abc.PrivateChannel) or channel.is_nsfw()
+        else:
+            safe = True
+
+        return embed, safe
+
+    async def try_sfw_image(self, path, channel, attempts=5):
+        assert attempts > 0
+        for _ in range(attempts):
+            items = await self.request(path)
+            item = items[0]['data']['children'][0]['data']
+
+            embed, sfw_ok = self.get_image(item, channel)
+            if sfw_ok:
+                return embed
+
+        return None
+
+    async def safe_or_react(self, ctx, path, attempts=5):
+        embed = await self.try_sfw_image(path, ctx.channel, attempts)
+        if embed is not None:
+            await ctx.send(embed=embed)
+        else:
+            await ctx.message.add_reaction('\N{NO ONE UNDER EIGHTEEN SYMBOL}')
+
     @commands.command()
     @check_reddit
     async def headpat(self, ctx):
-        items = await self.request('/r/headpats/random')
-        item = items[0]['data']['children'][0]['data']
-        
-        # If the image is nsfw and the channel isn't set as nsfw image is none
-        image = self.get_image(item, ctx.channel)
+        await self.safe_or_react(ctx, '/r/headpats/random')
 
-        if image is not None:
-            await ctx.send(embed=image)
-        else:
-            # Retry once more incase it was just that one
-
-            items = await self.request('/r/headpats/random')
-            item = items[0]['data']['children'][0]['data']
-        
-            image = self.get_image(item, ctx.channel)
-
-            if image is not None:
-                await ctx.send(embed=image)
-            else:
-                await ctx.message.add_reaction('🔞')
-    
     @commands.command()
     @check_reddit
     async def megane(self, ctx):
-        items = await self.request('/r/megane/random')
-        item = items[0]['data']['children'][0]['data']
-        
-        # If the image is nsfw and the channel isn't set as nsfw image is none
-        image = self.get_image(item, ctx.channel)
+        await self.safe_or_react(ctx, '/r/megane/random')
 
-        if image is not None:
-            await ctx.send(embed=image)
-        else:
-            # Retry once more incase it was just that one
-
-            items = await self.request('/r/megane/random')
-            item = items[0]['data']['children'][0]['data']
-        
-            image = self.get_image(item, ctx.channel)
-
-            if image is not None:
-                await ctx.send(embed=image)
-            else:
-                await ctx.message.add_reaction('🔞')
-    
     @commands.command()
     @check_reddit
     async def hentai(self, ctx):
-        items = await self.request('/r/hentai/random')
-        item = items[0]['data']['children'][0]['data']
-        
-        # If the image is nsfw and the channel isn't set as nsfw image is none
-        image = self.get_image(item, ctx.channel)
-
-        if image is not None:
-            await ctx.send(embed=image)
-        else:
-            # Retry once more incase it was just that one
-
-            items = await self.request('/r/hentai/random')
-            item = items[0]['data']['children'][0]['data']
-        
-            image = self.get_image(item, ctx.channel)
-
-            if image is not None:
-                await ctx.send(embed=image)
-            else:
-                await ctx.message.add_reaction('🔞')
+        await self.safe_or_react(ctx, '/r/hentai/random', attempts=1)
