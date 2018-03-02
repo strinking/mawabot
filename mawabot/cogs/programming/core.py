@@ -46,12 +46,22 @@ class Programming:
     async def exec(self, ctx, *, command: str):
         ''' Evaluates an arbitrary Python command '''
 
-        logger.info(f'Running python: "{command}"')
         embed = discord.Embed(type='rich')
         embed.set_author(name=command)
+
+        scope = locals()
+        scope.update({
+            'asyncio': asyncio,
+            'bot': self.bot,
+            'ctx': ctx,
+            'discord': discord,
+            'self': self,
+        })
+
+        logger.info(f'Running python: "{command}"')
         try:
             # pylint: disable=exec-used
-            exec(command)
+            exec(command, scope)
             embed.color = discord.Color.green()
             embed.description = 'Success'
             await ctx.send(embed=embed)
@@ -64,13 +74,23 @@ class Programming:
     async def eval(self, ctx, *, expr: str):
         ''' Evaluates an abritrary Python expression '''
 
-        logger.info(f'Evaluating python: "{expr}"')
         embed = discord.Embed(type='rich')
         embed.set_author(name=expr)
         embed.timestamp = datetime.now()
+
+        scope = locals()
+        scope.update({
+            'asyncio': asyncio,
+            'bot': self.bot,
+            'ctx': ctx,
+            'discord': discord,
+            'self': self,
+        })
+
+        logger.info(f'Evaluating python: "{expr}"')
         try:
             # pylint: disable=eval-used
-            result = eval(expr)
+            result = eval(expr, scope)
             embed.color = discord.Color.teal()
             embed.description = f'`{result!r}`'
         except Exception:
