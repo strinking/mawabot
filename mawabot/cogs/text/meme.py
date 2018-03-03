@@ -24,6 +24,10 @@ __all__ = [
     'Meme',
 ]
 
+CHECK_EM_URL = 'https://media.discordapp.net/attachments/336147052855558148/357986515030376458/check-em.jpg'
+BAD_CHECK_EM_URL = 'https://cdn.discordapp.com/attachments/287311630880997377/332092380738224128/raw.gif'
+OFF_BY_ONE_URL = 'https://cdn.discordapp.com/attachments/336147052855558148/357987379283361802/0d6.png'
+
 DISCORD_STRINGS = re.compile(r'(<\S*>)')
 
 logger = logging.getLogger(__name__)
@@ -224,3 +228,27 @@ class Meme:
             self._ohno(ctx),
             ctx.message.delete(),
         )
+
+    @staticmethod
+    def is_dubs(num):
+        return (num % 100) % 11 == 0
+
+    @commands.command(aliases=['dubs', 'trips'])
+    async def checkem(self, ctx):
+        ''' Check 'em! '''
+
+        number = random.randint(1, 10 ** 16)
+        embed = discord.Embed(type='rich', description=f'```{number}```')
+        embed.set_footer(
+            text='Brought to you by the anti-semitic frog foundation',
+            icon_url='https://i.imgur.com/Gn3vKn6.png',
+        )
+
+        if self.is_dubs(number):
+            embed.set_image(url=CHECK_EM_URL)
+        elif self.is_dubs(number + 1) or self.is_dubs(number - 1):
+            embed.set_image(url=OFF_BY_ONE_URL)
+        else:
+            embed.set_image(url=BAD_CHECK_EM_URL)
+
+        await ctx.send(embed=embed)
