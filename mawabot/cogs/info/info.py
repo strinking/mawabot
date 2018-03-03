@@ -241,6 +241,7 @@ class Info:
     async def id(self, ctx, *ids: int):
         ''' Gets information about the given snowflake(s) '''
 
+        tasks = []
         for id in ids:
             embed = discord.Embed(type='rich')
             embed.set_author(name=f'Snowflake {id}')
@@ -269,12 +270,32 @@ class Info:
 
             # Can't do get_message() since we're not a true bot
 
-            await ctx.send(embed=embed)
+            tasks.append(ctx.send(embed=embed))
+
+        await asyncio.gather(*tasks)
 
     @commands.command()
-    async def pins(self, ctx, name):
-        pass
-        # TODO
+    async def pins(self, ctx, name: str = None):
+        ''' Gets all the pins in the given channel '''
+
+        channel = self._get_channel(ctx, name)
+        if channel is not None:
+            pins = await channel.pins()
+
+            count = str(len(pins)) if pins else 'No'
+            plural = '' if len(pins) == 1 else 's'
+            embed = discord.Embed(type='rich', description=f'{count} pin{plural} in {channel.mention}')
+            await asyncio.gather(
+                ctx.message.delete(),
+                self.bot._send(embed=embed),
+            )
+
+            for i, message in enumerate(pins):
+                embed = discord.Embed(type='rich', description=message.content)
+                embed.set_author(name=message.author.display_name, icon_url=message.author.avatar_url)
+                embed.set_footer(text=f'Pin #{i+1}')
+                embed.timestamp = message.edited_at or message.created_at
+                await self.bot._send(embed=embed)
 
     @commands.command()
     async def emoji(self, ctx, *emojis: str):
