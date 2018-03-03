@@ -45,6 +45,11 @@ class Messages:
 
         return map(lambda t: t[1], sorted(messages))
 
+    @staticmethod
+    async def _hit(ctx, content):
+        if content is not None:
+            await ctx.send(content=content, delete_after=0)
+
     # Commands
     @commands.command()
     async def hit(self, ctx, *, content: str = None):
@@ -54,11 +59,6 @@ class Messages:
             self._hit(ctx, content),
             ctx.message.delete(),
         )
-
-    @staticmethod
-    async def _hit(ctx, content):
-        if content is not None:
-            await ctx.send(content=content, delete_after=0)
 
     @commands.command()
     async def delay(self, ctx, seconds: float, *, content: str):

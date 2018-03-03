@@ -11,10 +11,13 @@
 #
 
 ''' Has several commands that get guild information '''
+import asyncio
 import re
 
 import discord
 from discord.ext import commands
+
+from mawabot.utils import normalize_caseless
 
 NUMERIC_REGEX = re.compile(r'[0-9]+')
 ROLE_MENTION_REGEX = re.compile(r'<@&([0-9]+)>')
@@ -52,6 +55,19 @@ class Guild:
                     return role
         return None
 
+    def _get_guild(self, ctx, name):
+        if name is None:
+            return ctx.guild
+
+        if NUMERIC_REGEX.match(name):
+            return self.bot.get_guild(int(name))
+        else:
+            name = normalize_caseless(name)
+            for guild in self.bot.guilds:
+                if normalize_caseless(guild.name) == name:
+                    return guild
+        return None
+
     @commands.command()
     @commands.guild_only()
     async def ack(self, ctx, *names: str):
@@ -68,7 +84,7 @@ class Guild:
 
     @commands.command()
     @commands.guild_only()
-    async def ginfo(self, ctx):
+    async def ginfo(self, ctx, use_current=True):
         ''' Prints information about the current guild '''
 
         text_count = len(ctx.guild.text_channels)
@@ -96,18 +112,24 @@ class Guild:
         embed.add_field(name='Owner:', value=ctx.guild.owner.mention)
         embed.add_field(name='Default channel:', value=getattr(ctx.guild.default_channel, 'mention', '(none)'))
 
-        await ctx.send(embed=embed)
+        if use_current:
+            await ctx.send(embed=embed)
+        else:
+            await asyncio.gather(
+                ctx.message.delete(),
+                self.bot._send(embed=embed),
+            )
 
     @commands.command()
     @commands.guild_only()
-    async def rinfo(self, ctx, *, name: str = None):
+    async def rinfo(self, ctx, *, name: str = None, use_current=True):
         ''' Lists information about roles on the guild '''
 
         if name is None:
             fmt_role = lambda role: f'{role.mention} ({len(role.members)})'
             desc = ', '.join(map(fmt_role, ctx.guild.role_hierarchy))
             embed = discord.Embed(type='rich', description=desc)
-            await ctx.send(embed=embed)
+            embed.set_author(name=f'{len(ctx.guild.roles)} roles in {ctx.guild.name}')
         else:
             role = await self._get_role(ctx.guild, name)
 
@@ -131,11 +153,76 @@ class Guild:
                 embed.add_field(name='ID:', value=role.id)
                 embed.timestamp = role.created_at
 
+        if use_current:
             await ctx.send(embed=embed)
+        else:
+            await asyncio.gather(
+                ctx.message.delete(),
+                self.bot._send(embed=embed),
+            )
 
     @commands.command()
     @commands.guild_only()
-    async def perms(self, ctx, *names: str):
+    async def roles(self, ctx, name: str = None, use_current=True):
+        ''' Lists all roles in the current (or given) guild. '''
+
+        guild = self._get_guild(ctx, name)
+
+        if guild is None:
+            desc = f'**No such guild:** {name}'
+            embed = discord.Embed(type='rich', description=desc, color=discord.Color.red())
+        else:
+            def fmt_role(role):
+                default = 'Default ' if role.is_default() else ''
+                mentionable = 'Mentionable ' if role.mentionable else ''
+                admin = 'Admin ' if role.permissions.administrator else ''
+                mention = role.mention if ctx.guild == role.guild else f'@{role.name}'
+                count = f'({len(role.members)})'
+                return f'`{role.id}` {mention} {count} {default}{mentionable}{admin}'
+
+            desc = '\n'.join(map(fmt_role, guild.roles))
+            embed = discord.Embed(type='rich', description=desc)
+            embed.set_author(name=guild.name)
+
+        if use_current:
+            await ctx.send(embed=embed)
+        else:
+            await asyncio.gather(
+                ctx.message.delete(),
+                self.bot._send(embed=embed),
+            )
+
+    @commands.command()
+    @commands.guild_only()
+    async def channels(self, ctx, name: str = None, use_current=True):
+        ''' Lists all channels in the current (or given) guild. '''
+
+        guild = self._get_guild(ctx, name)
+
+        if guild is None:
+            desc = f'**No such guild:** {name}'
+            embed = discord.Embed(type='rich', description=desc, color=discord.Color.red())
+        else:
+            def fmt_chan(chan):
+                topic = f' - {chan.topic}' if chan.topic else ''
+                return f'`{chan.id}` {chan.mention} {topic}'
+
+            is_txt_chan = lambda chan: isinstance(chan, discord.TextChannel)
+            desc = '\n'.join(map(fmt_chan, filter(is_txt_chan, guild.channels)))
+            embed = discord.Embed(type='rich', description=desc)
+            embed.set_author(name=guild.name)
+
+        if use_current:
+            await ctx.send(embed=embed)
+        else:
+            await asyncio.gather(
+                ctx.message.delete(),
+                self.bot._send(embed=embed),
+            )
+
+    @commands.command()
+    @commands.guild_only()
+    async def perms(self, ctx, *names: str, use_current=True):
         for name in names:
             role = await self._get_role(ctx.guild, name)
 
@@ -176,13 +263,11 @@ class Guild:
                     f'Change nickname: `{perms.change_nickname}`',
                 ))
                 embed = discord.Embed(type='rich', description=desc, color=role.color)
-            await ctx.send(embed=embed)
 
-    @commands.command()
-    @commands.guild_only()
-    async def channels(self, ctx):
-        ''' Lists all channels in the current guild. '''
-
-        desc = '\n'.join(chan.mention for chan in ctx.guild.channels if isinstance(chan, discord.TextChannel))
-        embed = discord.Embed(type='rich', description=desc)
-        await ctx.send(embed=embed)
+            if use_current:
+                await ctx.send(embed=embed)
+            else:
+                await asyncio.gather(
+                    ctx.message.delete(),
+                    self.bot._send(embed=embed),
+                )
