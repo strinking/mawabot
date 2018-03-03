@@ -114,9 +114,9 @@ class Meme:
 
         content = self._regional_indicators(text)
         await asyncio.gather(
-            ctx.send(content=content),
-            ctx.message.delete(),
-        )
+                ctx.send(content=content),
+                ctx.message.delete(),
+                )
 
     @commands.command(aliases=['ril'])
     async def regional_indicators_large(self, ctx, *, text: str):
