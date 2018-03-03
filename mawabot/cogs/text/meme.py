@@ -95,20 +95,38 @@ class Meme:
             logger.info(f"Sending 'oh no.' for {message.id}")
             await self._ohno(message.channel)
 
-    @commands.command(aliaes=['ri'])
-    async def regionalindicators(self, ctx, *, text: str):
-        ''' Makes the whole message into regional_indicator emojis '''
+    def _regional_indicators(self, text, big=False):
+        ''' Helper that formats input text into regional indicators '''
 
+        # Note, can't pass in sep directly, causes a TypeError
+        # Something else is probably passing something called sep in automatically
+        sep = ' ' if big else '\u200b'
         def mapper(s):
             if s.startswith('<'):
                 return s
-            return '\u200b'.join(self.regional_emojis.get(c.lower(), c) for c in s)
+            return sep.join(self.regional_emojis.get(c.lower(), c) for c in s)
 
-        content = ''.join(map(mapper, DISCORD_STRINGS.split(text)))
+        return ''.join(map(mapper, DISCORD_STRINGS.split(text)))
+
+    @commands.command(aliases=['ri'])
+    async def regional_indicators(self, ctx, *, text: str):
+        ''' Makes the whole message into regional_indicator emojis '''
+
+        content = self._regional_indicators(text)
         await asyncio.gather(
             ctx.send(content=content),
             ctx.message.delete(),
         )
+
+    @commands.command(aliases=['ril'])
+    async def regional_indicators_large(self, ctx, *, text: str):
+        ''' Same as regional_indicators except the letters come out larger '''
+
+        content = self._regional_indicators(text, big=True)
+        await asyncio.gather(
+                ctx.send(content=content),
+                ctx.message.delete(),
+                )
 
     @commands.command(aliases=['sw'])
     async def spacewords(self, ctx, *, text: str):
