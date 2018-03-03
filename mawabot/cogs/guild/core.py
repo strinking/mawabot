@@ -20,7 +20,6 @@ from discord.ext import commands
 
 from mawabot.utils import normalize_caseless
 
-NUMERIC_REGEX = re.compile(r'[0-9]+')
 ROLE_MENTION_REGEX = re.compile(r'<@&([0-9]+)>')
 
 logger = logging.getLogger(__name__)
@@ -47,7 +46,7 @@ class Guild:
         if name == 'everyone':
             return guild.default_role
 
-        if NUMERIC_REGEX.match(name):
+        if name.isdigit():
             id = int(name)
         else:
             match = ROLE_MENTION_REGEX.match(name)
@@ -69,7 +68,7 @@ class Guild:
         if name is None:
             return ctx.guild
 
-        if NUMERIC_REGEX.match(name):
+        if name.isidigit():
             return self.bot.get_guild(int(name))
         else:
             name = normalize_caseless(name)

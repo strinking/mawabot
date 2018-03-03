@@ -11,6 +11,7 @@
 #
 
 ''' Contains in-depth commands that get information '''
+import asyncio
 import re
 import unicodedata
 
@@ -161,38 +162,27 @@ class Info:
 
             await ctx.send(embed=embed)
 
-    @commands.command()
-    async def cinfo(self, ctx, *names: str):
-        ''' Gets information about a given channel '''
-
-        if not names:
-            await self._cinfo(ctx, None)
-        for name in names:
-            await self._cinfo(ctx, name)
-
-    async def _cinfo(self, ctx, name):
-        # Read argument
+    def _get_channel(self, ctx, name):
         if name is None:
-            channel = ctx.channel
+            return ctx.channel
         else:
-            channel = None
             match = CHANNEL_REGEX.match(name)
             if match:
                 cid = int(match[1])
             elif name.isdigit():
                 cid = int(name)
-            elif ctx.guild:
-                channel = discord.utils.find(lambda chan: name == chan.name, ctx.guild.channels)
+            elif ctx.guild is not None:
+                return discord.utils.get(ctx.guild.channels, name=name)
+        return self.bot.get_channel(cid)
 
-        # Retrieve channel from ID
-        if channel is None and cid:
-            channel = self.bot.get_channel(cid)
+    def _cinfo(self, ctx, name):
+        channel = self._get_channel(ctx, name)
 
         # Couldn't find it
         if channel is None:
             embed = discord.Embed(description=f'No channel found that matched {name}', color=discord.Color.red())
             embed.set_author(name='Error')
-            await ctx.send(embed=embed)
+            return embed
         else:
             embed = discord.Embed()
             embed.timestamp = channel.created_at
@@ -234,9 +224,20 @@ class Info:
                     desc.append(f'Owner: `{channel.owner.name}`')
 
             embed.description = '\n'.join(desc)
-            await ctx.send(embed=embed)
+            return embed
 
     @commands.command()
+    async def cinfo(self, ctx, *names: str):
+        ''' Gets information about a given channel '''
+
+        if names:
+            embeds = (self._cinfo(ctx, name) for name in names)
+        else:
+            embeds = (self._cinfo(ctx, None),)
+
+        await asyncio.gather(*[ctx.send(embed=embed) for embed in embeds])
+
+    @commands.command(aliases=['snowflake'])
     async def id(self, ctx, *ids: int):
         ''' Gets information about the given snowflake(s) '''
 
@@ -269,6 +270,11 @@ class Info:
             # Can't do get_message() since we're not a true bot
 
             await ctx.send(embed=embed)
+
+    @commands.command()
+    async def pins(self, ctx, name):
+        pass
+        # TODO
 
     @commands.command()
     async def emoji(self, ctx, *emojis: str):
