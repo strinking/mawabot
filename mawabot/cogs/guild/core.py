@@ -175,6 +175,7 @@ class Guild:
             def fmt_role(role):
                 default = 'Default ' if role.is_default() else ''
                 mentionable = 'Mentionable ' if role.mentionable else ''
+                mentions_everyone = 'Mention @everyone ' if role.permissions.mention_everyone else ''
                 admin = 'Admin ' if role.permissions.administrator else ''
                 mention = role.mention if ctx.guild == role.guild else f'@{role.name}'
                 count = f'({len(role.members)})'
