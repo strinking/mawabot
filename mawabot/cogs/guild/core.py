@@ -155,7 +155,6 @@ class Guild:
         embed.set_author(name=ctx.guild.name)
 
         embed.add_field(name='Owner:', value=ctx.guild.owner.mention)
-        embed.add_field(name='Default channel:', value=getattr(ctx.guild.default_channel, 'mention', '(none)'))
 
         if use_current:
             await ctx.send(embed=embed)
