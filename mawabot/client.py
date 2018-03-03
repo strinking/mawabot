@@ -111,7 +111,7 @@ class Bot(commands.Bot):
         logger.info('Reconnected - setting status to invisible')
         await self.change_presence(status=discord.Status.invisible)
 
-    async def _send(self, *args, **kwargs):
+    async def send(self, *args, **kwargs):
         if self.output_chan is None:
             logger.warning('No output channel set!')
         else:

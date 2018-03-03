@@ -35,10 +35,10 @@ class History:
         embed.set_author(name=msg.author.display_name, icon_url=msg.author.avatar_url)
         embed.set_footer(text=f'Message #{num}')
         embed.timestamp = msg.edited_at or msg.created_at
-        await self.bot._send(embed=embed)
+        await self.bot.send(embed=embed)
 
     async def _output_id(self, num, msg):
-        await self.bot._send(content=f'`{num:2}: {msg.id}`')
+        await self.bot.send(content=f'`{num:2}: {msg.id}`')
 
     @commands.command()
     async def hist(self, ctx, limit: int, *args: str):
@@ -70,7 +70,7 @@ class History:
                 raise ValueError(f"Unknown parameter: {param}")
 
         await asyncio.gather(
-            self.bot._send(content=f'**{limit} messages from {ctx.channel.mention}:**'),
+            self.bot.send(content=f'**{limit} messages from {ctx.channel.mention}:**'),
             ctx.message.delete(),
         )
 
@@ -84,4 +84,4 @@ class History:
                 )
                 i += 1
 
-        await self.bot._send(content=f'Done running `{ctx.message.content}`')
+        await self.bot.send(content=f'Done running `{ctx.message.content}`')

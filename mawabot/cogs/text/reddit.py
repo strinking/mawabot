@@ -28,7 +28,7 @@ def check_reddit(func):
         if self.bot.config['reddit'] is None:
             content = 'This command requires Reddit integration, but no token was given'
             logger.warning(content)
-            await self.bot._send(content)
+            await self.bot.send(content)
             return
 
         await func(self, ctx)
