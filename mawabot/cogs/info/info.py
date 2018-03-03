@@ -14,6 +14,7 @@
 import asyncio
 import re
 import unicodedata
+from pprint import pformat
 
 import discord
 from discord.ext import commands
@@ -296,6 +297,37 @@ class Info:
                 embed.set_footer(text=f'Pin #{i+1}')
                 embed.timestamp = message.edited_at or message.created_at
                 await self.bot._send(embed=embed)
+
+    @commands.command(aliases=['audit', 'alog'])
+    async def audit_logs(self, ctx, limit: int = 20):
+        ''' Retrieve the last 20 (or specified) entries in the audit log '''
+
+        await ctx.message.delete()
+        async for entry in ctx.guild.audit_logs(limit=limit):
+            embed = discord.Embed(type='rich')
+            embed.timestamp = entry.created_at
+            embed.set_author(name=entry.user.display_name, icon_url=entry.user.avatar_url)
+            embed.add_field(name='Type:', value=f'`{entry.action.name}`')
+            embed.add_field(name='Target:', value=f'`{entry.target!r}`')
+            embed.description = '\n'.join((
+                '**Before:**',
+                '```json',
+                pformat(dict(entry.before)),
+                '```\n',
+                '**After:**',
+                '```json',
+                pformat(dict(entry.after)),
+                '```',
+            ))
+
+            if entry.reason is not None:
+                embed.add_field(name='Reason:', value=entry.reason)
+            if entry.category is not None:
+                embed.add_field(name='Category:', value=f'`{entry.category.name}`')
+            if entry.extra is not None:
+                embed.add_field(name='Extra:', value=f'`{entry.extra!r}`')
+
+            await self.bot._send(embed=embed)
 
     @commands.command()
     async def emoji(self, ctx, *emojis: str):
