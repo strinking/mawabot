@@ -12,6 +12,7 @@
 
 ''' Has several commands that get guild information '''
 import asyncio
+import logging
 import re
 
 import discord
@@ -22,13 +23,22 @@ from mawabot.utils import normalize_caseless
 NUMERIC_REGEX = re.compile(r'[0-9]+')
 ROLE_MENTION_REGEX = re.compile(r'<@&([0-9]+)>')
 
+logger = logging.getLogger(__name__)
+
 class Guild:
     __slots__ = (
         'bot',
+        'autonick_guilds',
+        'autonick_task',
     )
 
     def __init__(self, bot):
         self.bot = bot
+        self.autonick_guilds = {}
+        self.autonick_task = bot.loop.create_task(self._autonick())
+
+    def __unload(self):
+        self.autonick_task.cancel()
 
     @staticmethod
     async def _get_role(guild, name):
@@ -67,6 +77,42 @@ class Guild:
                 if normalize_caseless(guild.name) == name:
                     return guild
         return None
+
+    async def _autonick(self):
+        delay = 5
+        while True:
+            logger.debug('Checking autonick status...')
+            tasks = [asyncio.sleep(delay)]
+
+            for guild, nickname in self.autonick_guilds.items():
+                display_name = nickname or self.bot.user.name
+                if guild.me.display_name != display_name:
+                    logger.info(f'Changing nickname for {guild.name} to "{display_name}"')
+                    tasks.append(guild.me.edit(nick=nickname))
+                    delay = 1
+
+            if len(tasks) == 1:
+                logger.debug(f'No autonicks needed, increasing delay to {delay}')
+                delay = min(delay * 2, 240)
+
+            await asyncio.gather(*tasks)
+
+    @commands.command()
+    @commands.guild_only()
+    async def autonick(self, ctx, enable: bool, nickname: str = None, hide=False):
+        ''' Enable/disable task to automatically reset your username periodically '''
+
+        if enable:
+            self.autonick_guilds[ctx.guild] = nickname
+        else:
+            self.autonick_guilds.pop(ctx.guild)
+
+        if hide:
+            await ctx.mesage.delete()
+        else:
+            enabled = 'Enabled' if enable else 'Disabled'
+            embed = discord.Embed(type='rich', description=f'**{enabled}** autonick for {ctx.guild.name}')
+            await ctx.send(embed=embed)
 
     @commands.command()
     @commands.guild_only()
@@ -179,7 +225,7 @@ class Guild:
                 admin = 'Admin ' if role.permissions.administrator else ''
                 mention = role.mention if ctx.guild == role.guild else f'@{role.name}'
                 count = f'({len(role.members)})'
-                return f'`{role.id}` {mention} {count} {default}{mentionable}{admin}'
+                return f'`{role.id}` {mention} {count} {default}{mentionable}{mentions_everyone}{admin}'
 
             desc = '\n'.join(map(fmt_role, guild.roles))
             embed = discord.Embed(type='rich', description=desc)
