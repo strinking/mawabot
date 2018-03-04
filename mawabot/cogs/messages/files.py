@@ -64,7 +64,7 @@ class Files:
             embed.color = discord.Color.red()
             embed.description = f'```py\n{traceback.format_exc()}\n```'
             embed.timestamp = datetime.now()
-            await self.bot.send(embed=embed)
+            await self.bot.output_send(embed=embed)
         await fut
 
     @staticmethod
@@ -107,7 +107,7 @@ class Files:
 
         await asyncio.gather(
             ctx.message.delete(),
-            self.bot.send(embed=embed),
+            self.bot.output_send(embed=embed),
         )
 
     async def _download(self, ctx, posts):

@@ -109,7 +109,7 @@ class Messages:
                 urls = '\n'.join(attach.url for attach in msg.attachments)
                 embed.add_field(name='Attachments:', value=urls)
             tasks.append(ctx.send(embed=embed))
-            tasks.append(self.bot.send(embed=embed))
+            tasks.append(self.bot.output_send(embed=embed))
         await asyncio.gather(*tasks)
 
     @commands.command()
@@ -141,7 +141,7 @@ class Messages:
             if msg.attachments:
                 urls = '\n'.join(attach.url for attach in msg.attachments)
                 embed.add_field(name='Attachments:', value=urls)
-            tasks.append(self.bot.send(embed=embed))
+            tasks.append(self.bot.output_send(embed=embed))
             tasks += [self.bot.send(embed=embed) for embed in msg.embeds]
         await asyncio.gather(*tasks)
 
