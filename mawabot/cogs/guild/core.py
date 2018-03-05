@@ -14,6 +14,7 @@
 import asyncio
 import logging
 import re
+from math import ceil
 
 import discord
 from discord.ext import commands
@@ -263,6 +264,62 @@ class Guild:
             await asyncio.gather(
                 ctx.message.delete(),
                 self.bot._send(embed=embed),
+            )
+
+    @staticmethod
+    async def _send_embeds(messageable, embeds):
+        for embed in embeds:
+            await messageable.send(embed=embed)
+
+    @commands.command()
+    @commands.guild_only()
+    async def emojis(self, ctx, name: str = None, use_current=True):
+        ''' List all emotes in the current (or given) guild. '''
+
+        guild = self._get_guild(ctx, name)
+
+        if guild is None:
+            desc = f'**No such guild:** {name}'
+            embeds = [discord.Embed(type='rich', description=desc, color=discord.Color.red())]
+        else:
+            if guild.emojis:
+                embeds = []
+                lines = []
+                page = 1
+                total = int(ceil(len(guild.emojis) / 10))
+                for emoji in guild.emojis:
+                    if emoji.roles:
+                        roles = ', '.join(role.name for role in emoji.roles)
+                        role_restrictions = f'- Limited to roles: [{roles}]'
+                    else:
+                        role_restrictions = ''
+
+                    lines.append(f'[`{emoji.id}`]({emoji.url}) {emoji} {emoji.name} {role_restrictions}')
+
+                    if len(lines) > 10:
+                        desc = '\n'.join(lines)
+                        embed = discord.Embed(type='rich', description=desc)
+                        embed.set_author(name=f'{guild.name} ({page}/{total})')
+                        embeds.append(embed)
+                        lines = []
+                        page += 1
+
+                if lines:
+                    desc = '\n'.join(lines)
+                    embed = discord.Embed(type='rich', description=desc)
+                    embed.set_author(name=f'{guild.name} ({page}/{total})')
+                    embeds.append(embed)
+            else:
+                embed = discord.Embed(type='rich', description='(No emojis)')
+                embed.set_author(name=guild.name)
+                embeds = [embed]
+
+        if use_current:
+            await self._send_embeds(ctx, embeds)
+        else:
+            await asyncio.gather(
+                ctx.message.delete(),
+                self._send_embeds(self.bot.output_chan, embeds)
             )
 
     @commands.command()
