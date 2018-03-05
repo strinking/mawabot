@@ -68,7 +68,7 @@ class Guild:
         if name is None:
             return ctx.guild
 
-        if name.isidigit():
+        if name.isdigit():
             return self.bot.get_guild(int(name))
         else:
             name = normalize_caseless(name)
