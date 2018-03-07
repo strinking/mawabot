@@ -332,7 +332,7 @@ class Information:
             embed = discord.Embed(type='rich', description=f'{count} pin{plural} in {channel.mention}')
             await asyncio.gather(
                 ctx.message.delete(),
-                self.bot._send(embed=embed),
+                self.bot.output_send(embed=embed),
             )
 
             for i, message in enumerate(pins):
@@ -340,7 +340,7 @@ class Information:
                 embed.set_author(name=message.author.display_name, icon_url=message.author.avatar_url)
                 embed.set_footer(text=f'Pin #{i+1}')
                 embed.timestamp = message.edited_at or message.created_at
-                await self.bot._send(embed=embed)
+                await self.bot.output_send(embed=embed)
 
     @commands.command(aliases=['audit', 'alog'])
     async def audit_logs(self, ctx, limit: int = 20):
@@ -371,7 +371,7 @@ class Information:
             if entry.extra is not None:
                 embed.add_field(name='Extra:', value=f'`{entry.extra!r}`')
 
-            await self.bot._send(embed=embed)
+            await self.bot.output_send(embed=embed)
 
     @commands.command()
     async def emoji(self, ctx, *emojis: str):

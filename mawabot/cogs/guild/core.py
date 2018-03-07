@@ -168,7 +168,7 @@ class Guild:
         else:
             await asyncio.gather(
                 ctx.message.delete(),
-                self.bot._send(embed=embed),
+                self.bot.output_send(embed=embed),
             )
 
     @commands.command()
@@ -209,7 +209,7 @@ class Guild:
         else:
             await asyncio.gather(
                 ctx.message.delete(),
-                self.bot._send(embed=embed),
+                self.bot.output_send(embed=embed),
             )
 
     @commands.command()
@@ -241,7 +241,7 @@ class Guild:
         else:
             await asyncio.gather(
                 ctx.message.delete(),
-                self.bot._send(embed=embed),
+                self.bot.output_send(embed=embed),
             )
 
     @commands.command()
@@ -269,7 +269,7 @@ class Guild:
         else:
             await asyncio.gather(
                 ctx.message.delete(),
-                self.bot._send(embed=embed),
+                self.bot.output_send(embed=embed),
             )
 
     @commands.command()
@@ -321,5 +321,5 @@ class Guild:
             else:
                 await asyncio.gather(
                     ctx.message.delete(),
-                    self.bot._send(embed=embed),
+                    self.bot.output_send(embed=embed),
                 )
