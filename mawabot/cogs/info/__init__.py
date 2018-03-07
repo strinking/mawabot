@@ -11,7 +11,7 @@
 #
 
 from .core import General
-from .info import Info
+from .info import Information
 from .stats import Stats
 
 __all__ = [
@@ -21,5 +21,5 @@ __all__ = [
 def setup(bot):
     ''' Setup function to add cog to bot '''
     bot.add_cog(General(bot))
-    bot.add_cog(Info(bot))
+    bot.add_cog(Information(bot))
     bot.add_cog(Stats(bot))

@@ -22,16 +22,14 @@ from discord.ext import commands
 from mawabot.utils import normalize_caseless
 
 __all__ = [
-    'Info',
+    'Information',
 ]
 
 CHANNEL_REGEX = re.compile(r'<#([0-9]+)>')
 MENTION_REGEX = re.compile(r'<@!?([0-9]+)>')
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
 
-from random import random
-
-class Info:
+class Information:
     __slots__ = (
         'bot',
     )
