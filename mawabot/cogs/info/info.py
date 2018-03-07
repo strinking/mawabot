@@ -177,29 +177,29 @@ class Info:
                             if '_' in id:
                                 region, id = id.split('_')
                                 url = f'http://lolking.net/summoner/{region}/{id}'
-                                accounts.append(f'[League of Legends]({url}) {verified}')
+                                accounts.append(f'[League of Legends {verified}]({url})')
                             else:
                                 accounts.append(f'League of Legends: {name} {verified}')
                         elif type == 'reddit':
                             url = f'https://www.reddit.com/user/{name}'
-                            accounts.append(f'[Reddit]({url}) {verified}')
+                            accounts.append(f'[Reddit {verified}]({url})')
                         elif type == 'skype':
                             accounts.append(f'Skype: {name} {verified}')
                         elif type == 'spotify':
                             url = f'https://open.spotify.com/user/{id}'
-                            accounts.append(f'[Spotify]({url}) {verified}')
+                            accounts.append(f'[Spotify {verified}]({url})')
                         elif type == 'steam':
                             url = f'https://steamcommunity.com/profiles/{id}'
-                            accounts.append(f'[Steam]({url}) {verified}')
+                            accounts.append(f'[Steam {verified}]({url})')
                         elif type == 'twitch':
                             url = f'https://www.twitch.tv/{name}'
-                            accounts.append(f'[Twitch]({url}) {verified}')
+                            accounts.append(f'[Twitch {verified}]({url})')
                         elif type == 'twitter':
                             url = f'https://twitter.com/{name}'
-                            accounts.append(f'[Twitter]({url}) {verified}')
+                            accounts.append(f'[Twitter {verified}]({url})')
                         elif type == 'youtube':
                             url = f'https://www.youtube.com/channel/{id}'
-                            accounts.append(f'[YouTube]({url}) {verified}')
+                            accounts.append(f'[YouTube {verified}]({url})')
                         else:
                             accounts.append(f'{type}: {name} `{id}` {verified}')
 
