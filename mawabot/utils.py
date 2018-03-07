@@ -137,11 +137,13 @@ def paginate(text, page_size=5):
     ''' Splits input into page sized chunks '''
     pages = []
     lines = []
-    for line in data.splitlines(keepends=True):
-        if len(lines) >= page_size:
+    for line in text.splitlines(keepends=True):
+        if len(lines) == page_size:
             pages.append(''.join(lines))
             del lines[:]
         lines.append(line)
+    if lines:
+        pages.append(''.join(lines))
     return pages
 
 def normalize_caseless(s):
