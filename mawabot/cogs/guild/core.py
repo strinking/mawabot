@@ -79,9 +79,15 @@ class Guild:
 
     async def _autonick(self):
         delay = 5
+        old_len = 0
+
         while True:
             logger.debug('Checking autonick status...')
             tasks = [asyncio.sleep(delay)]
+
+            if old_len != len(self.autonick_guilds):
+                logger.info(f'Autonick list changed, resetting delay...')
+                delay = 1
 
             for guild, nickname in self.autonick_guilds.items():
                 display_name = nickname or self.bot.user.name
@@ -92,8 +98,9 @@ class Guild:
 
             if len(tasks) == 1:
                 logger.debug(f'No autonicks needed, increasing delay to {delay}')
-                delay = min(delay * 2, 240)
+                delay = min(delay * 2, 3600)
 
+            old_len = len(self.autonick_guilds)
             await asyncio.gather(*tasks)
 
     @commands.command()

@@ -116,3 +116,11 @@ class Bot(commands.Bot):
             logger.warning('No output channel set!')
         else:
             await self.output_chan.send(*args, **kwargs)
+
+    @commands.command()
+    async def panic(self, arg: str = ''):
+        ''' Kill switch for the bot. The argument must be '-f' or 'force'. '''
+
+        if arg in ('-f', '--force', 'force'):
+            logger.error("Panicking at user's request")
+            exit(1)

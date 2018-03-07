@@ -19,12 +19,17 @@ from pprint import pformat
 import discord
 from discord.ext import commands
 
+from mawabot.utils import normalize_caseless
+
 __all__ = [
     'Info',
 ]
 
 CHANNEL_REGEX = re.compile(r'<#([0-9]+)>')
+MENTION_REGEX = re.compile(r'<@!?([0-9]+)>')
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
+
+from random import random
 
 class Info:
     __slots__ = (
@@ -34,64 +39,57 @@ class Info:
     def __init__(self, bot):
         self.bot = bot
 
-    def _get_users(self, names):
-        if not names:
-            return [self.bot.user]
+    async def _get_profile(self, user_or_id):
+        if isinstance(user_or_id, discord.User):
+            try:
+                profile = await user_or_id.profile()
+            except discord.NotFound:
+                profile = None
 
-        users = []
+            return profile, user_or_id
+        else:
+            try:
+                profile = await self.bot.get_user_profile(user_or_id)
+                return profile, profile.user
+            except discord.NotFound:
+                user = discord.utils.get(self.bot.users, id=user_or_id)
+                return None, user
+
+    async def _get_profiles(self, names):
+        if not names:
+            names = ['me']
+
+        uids = []
         for name in names:
-            if name == 'me':
-                users.append(self.bot.user)
+            if name == 'me' or name == 'myself':
+                uids.append(self.bot.user.id)
                 continue
 
-            try:
-                id = int(name)
-                user = self.bot.get_user(id)
-                if user:
-                    users.append(user)
-            except ValueError:
-                for user in self.bot.users:
-                    if user.name == name:
-                        users.append(user)
-                        break
-        return users
+            match = MENTION_REGEX.match(name)
+            if match is not None:
+                uid = int(match[1])
+            elif name.isdigit():
+                uid = int(name)
+            else:
+                nname = normalize_caseless(name)
+                uid = discord.utils.find(lambda u: nname == normalize_caseless(u.name), self.bot.users)
 
-    def _get_members(self, guild, names):
-        if not names:
-            return [guild.me]
+            uids.append(uid)
 
-        members = []
-        for name in names:
-            if name == 'me':
-                members.append(guild.me)
-                continue
+        profiles = await asyncio.gather(*[self._get_profile(uid) for uid in uids])
+        return list(filter(lambda t: t[1] is not None, profiles))
 
-            try:
-                id = int(name)
-                member = guild.get_member(id)
-                if member:
-                    members.append(member)
-            except ValueError:
-                member = guild.get_member_named(name)
-                if member:
-                    members.append(member)
-        return members
-
-    @commands.command()
-    async def uinfo(self, ctx, *names: str):
+    @commands.command(aliases=['uinfo'])
+    async def user_info(self, ctx, *names: str):
         ''' Gets information about the given user(s) '''
 
-        if ctx.guild is None:
-            users = self._get_users(names)
-        else:
-            users = self._get_members(ctx.guild, names)
+        profiles = await self._get_profiles(names)
+        if not profiles:
+            embed = discord.Embed(type='rich', description='No user profiles found.')
+            await ctx.send(embed=embed)
+            return
 
-        for user in users:
-            profile = None
-            if not user.bot and not isinstance(user, discord.ClientUser):
-                # Get user profile info
-                profile = await user.profile()
-
+        for profile, user in profiles:
             lines = [user.mention]
 
             if profile is not None:
@@ -126,7 +124,7 @@ class Info:
                 if user.nick:
                     lines.append(f'Nickname: {user.nick}')
 
-                roles = ' '.join(map(lambda x: x.mention, user.roles[1:]))
+                roles = ' '.join(map(lambda r: r.mention, user.roles[1:]))
                 if roles:
                     lines.append(f'Roles: {roles}')
 
@@ -145,18 +143,56 @@ class Info:
                 embed.add_field(name='Status:', value=f'`{user.status}`')
             embed.add_field(name='ID:', value=f'`{user.id}`')
 
-            # Get connected accounts
             if profile is not None:
+                # Mutual guilds
+                if profile.mutual_guilds:
+                    guild_names = ', '.join(map(lambda g: g.name, profile.mutual_guilds))
+                    embed.add_field(name=f'Mutual Guilds: ({len(profile.mutual_guilds)})', value=guild_names)
+
+                # Get connected accounts
                 if profile.connected_accounts:
                     accounts = []
 
                     for account in profile.connected_accounts:
-                        if account['type'] == 'steam':
-                            url = f'https://steamcommunity.com/profiles/{account["id"]}'
-                            accounts.append(f'[{account["name"]}]({url})')
-                        elif account['type'] == 'twitch':
-                            url = f'https://www.twitch.tv/{account["name"]}'
-                            accounts.append(f'[{account["name"]}]({url})')
+                        id = account['id']
+                        name = account['name']
+                        type = account['type']
+                        verified = '`\N{WHITE HEAVY CHECK MARK}`' if account['verified'] else ''
+
+                        if type == 'battlenet':
+                            accounts.append(f'battle.net: {name} {verified}')
+                        elif type == 'facebook':
+                            url = f'https://www.facebook.com/{id}'
+                            accounts.append(f'[Facebook]({url}) {verified}')
+                        elif type == 'leagueoflegends':
+                            if '_' in id:
+                                region, id = id.split('_')
+                                url = f'http://lolking.net/summoner/{region}/{id}'
+                                accounts.append(f'[League of Legends]({url}) {verified}')
+                            else:
+                                accounts.append(f'League of Legends: {name} {verified}')
+                        elif type == 'reddit':
+                            url = f'https://www.reddit.com/user/{name}'
+                            accounts.append(f'[Reddit]({url}) {verified}')
+                        elif type == 'skype':
+                            accounts.append(f'Skype: {name} {verified}')
+                        elif type == 'spotify':
+                            url = f'https://open.spotify.com/user/{id}'
+                            accounts.append(f'[Spotify]({url}) {verified}')
+                        elif type == 'steam':
+                            url = f'https://steamcommunity.com/profiles/{id}'
+                            accounts.append(f'[Steam]({url}) {verified}')
+                        elif type == 'twitch':
+                            url = f'https://www.twitch.tv/{name}'
+                            accounts.append(f'[Twitch]({url}) {verified}')
+                        elif type == 'twitter':
+                            url = f'https://twitter.com/{name}'
+                            accounts.append(f'[Twitter]({url}) {verified}')
+                        elif type == 'youtube':
+                            url = f'https://www.youtube.com/channel/{id}'
+                            accounts.append(f'[YouTube]({url}) {verified}')
+                        else:
+                            accounts.append(f'{type}: {name} `{id}` {verified}')
 
                     if accounts:
                         embed.add_field(name='Connected Accounts:', value=', '.join(accounts))
@@ -227,8 +263,8 @@ class Info:
             embed.description = '\n'.join(desc)
             return embed
 
-    @commands.command()
-    async def cinfo(self, ctx, *names: str):
+    @commands.command(aliases=['cinfo', 'vcinfo'])
+    async def channel_info(self, ctx, *names: str):
         ''' Gets information about a given channel '''
 
         if names:
@@ -238,8 +274,8 @@ class Info:
 
         await asyncio.gather(*[ctx.send(embed=embed) for embed in embeds])
 
-    @commands.command(aliases=['snowflake'])
-    async def id(self, ctx, *ids: int):
+    @commands.command(aliases=['id'])
+    async def snowflake(self, ctx, *ids: int):
         ''' Gets information about the given snowflake(s) '''
 
         tasks = []
