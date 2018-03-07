@@ -93,9 +93,18 @@ class Info:
             lines = [user.mention]
 
             if profile is not None:
+                # Nitro
                 if profile.premium:
                     since = profile.premium_since.strftime('%x @ %X')
-                    lines.append(f'Nitro user since `{since}`')
+                    lines.append(f'- Nitro user since `{since}`')
+
+                # Other markers
+                if profile.staff:
+                    lines.append('- Discord Staff')
+                if profile.partner:
+                    lines.append('- Discord Partner')
+                if profile.hypesquad:
+                    lines.append('- Hypesquad')
 
             if isinstance(user, discord.Member):
                 if user.game:
