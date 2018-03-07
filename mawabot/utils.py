@@ -133,17 +133,16 @@ class Wrapper:
     def __init__(self, item=None):
         self.item = item
 
-def page(data, page_size=5):
+def paginate(text, page_size=5):
     ''' Splits input into page sized chunks '''
-    tmp_page = ''
-    page_list = []
-    for index, line in enumerate(data.splitlines(keepends=True)):
-        # Check if index is at least page_size, prevents excessively small pages being created
-        if index % page_size == 0 and index >= page_size:
-            page_list.append(tmp_page)
-            tmp_page = ''
-        tmp_page = ''.join((tmp_page, line))
-    return page_list
+    pages = []
+    lines = []
+    for line in data.splitlines(keepends=True):
+        if len(lines) >= page_size:
+            pages.append(''.join(lines))
+            del lines[:]
+        lines.append(line)
+    return pages
 
 def normalize_caseless(s):
     return unicodedata.normalize('NFKD', s.casefold())
