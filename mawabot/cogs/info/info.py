@@ -70,12 +70,58 @@ class Information:
                 uid = int(name)
             else:
                 nname = normalize_caseless(name)
-                uid = discord.utils.find(lambda u: nname == normalize_caseless(u.name), self.bot.users)
+                uid = discord.utils.find(lambda u, n=nname: normalize_caseless(u.name) == n, self.bot.users)
 
             uids.append(uid)
 
         profiles = await asyncio.gather(*[self._get_profile(uid) for uid in uids])
         return list(filter(lambda t: t[1] is not None, profiles))
+
+    @staticmethod
+    def _connected_accounts(connected_accounts):
+        accounts = []
+        for account in connected_accounts:
+            id = account['id']
+            name = account['name']
+            type = account['type']
+            verified = '`\N{WHITE HEAVY CHECK MARK}`' if account['verified'] else ''
+
+            if type == 'battlenet':
+                accounts.append(f'battle.net: {name} {verified}')
+            elif type == 'facebook':
+                url = f'https://www.facebook.com/{id}'
+                accounts.append(f'[Facebook]({url}) {verified}')
+            elif type == 'leagueoflegends':
+                if '_' in id:
+                    region, id = id.split('_')
+                    url = f'http://lolking.net/summoner/{region}/{id}'
+                    accounts.append(f'[League of Legends {verified}]({url})')
+                else:
+                    accounts.append(f'League of Legends: {name} {verified}')
+            elif type == 'reddit':
+                url = f'https://www.reddit.com/user/{name}'
+                accounts.append(f'[Reddit {verified}]({url})')
+            elif type == 'skype':
+                accounts.append(f'Skype: {name} {verified}')
+            elif type == 'spotify':
+                url = f'https://open.spotify.com/user/{id}'
+                accounts.append(f'[Spotify {verified}]({url})')
+            elif type == 'steam':
+                url = f'https://steamcommunity.com/profiles/{id}'
+                accounts.append(f'[Steam {verified}]({url})')
+            elif type == 'twitch':
+                url = f'https://www.twitch.tv/{name}'
+                accounts.append(f'[Twitch {verified}]({url})')
+            elif type == 'twitter':
+                url = f'https://twitter.com/{name}'
+                accounts.append(f'[Twitter {verified}]({url})')
+            elif type == 'youtube':
+                url = f'https://www.youtube.com/channel/{id}'
+                accounts.append(f'[YouTube {verified}]({url})')
+            else:
+                accounts.append(f'{type}: {name} `{id}` {verified}')
+
+        return '\n'.join(accounts)
 
     @commands.command(aliases=['uinfo'])
     async def user_info(self, ctx, *names: str):
@@ -135,9 +181,6 @@ class Information:
                 if roles:
                     lines.append(f'Roles: {roles}')
 
-            # For embed.color
-            # pylint: disable=assigning-non-slot
-
             embed = discord.Embed(type='rich', description='\n'.join(lines))
             embed.timestamp = user.created_at
             if hasattr(user, 'color'):
@@ -158,51 +201,9 @@ class Information:
 
                 # Get connected accounts
                 if profile.connected_accounts:
-                    accounts = []
-
-                    for account in profile.connected_accounts:
-                        id = account['id']
-                        name = account['name']
-                        type = account['type']
-                        verified = '`\N{WHITE HEAVY CHECK MARK}`' if account['verified'] else ''
-
-                        if type == 'battlenet':
-                            accounts.append(f'battle.net: {name} {verified}')
-                        elif type == 'facebook':
-                            url = f'https://www.facebook.com/{id}'
-                            accounts.append(f'[Facebook]({url}) {verified}')
-                        elif type == 'leagueoflegends':
-                            if '_' in id:
-                                region, id = id.split('_')
-                                url = f'http://lolking.net/summoner/{region}/{id}'
-                                accounts.append(f'[League of Legends {verified}]({url})')
-                            else:
-                                accounts.append(f'League of Legends: {name} {verified}')
-                        elif type == 'reddit':
-                            url = f'https://www.reddit.com/user/{name}'
-                            accounts.append(f'[Reddit {verified}]({url})')
-                        elif type == 'skype':
-                            accounts.append(f'Skype: {name} {verified}')
-                        elif type == 'spotify':
-                            url = f'https://open.spotify.com/user/{id}'
-                            accounts.append(f'[Spotify {verified}]({url})')
-                        elif type == 'steam':
-                            url = f'https://steamcommunity.com/profiles/{id}'
-                            accounts.append(f'[Steam {verified}]({url})')
-                        elif type == 'twitch':
-                            url = f'https://www.twitch.tv/{name}'
-                            accounts.append(f'[Twitch {verified}]({url})')
-                        elif type == 'twitter':
-                            url = f'https://twitter.com/{name}'
-                            accounts.append(f'[Twitter {verified}]({url})')
-                        elif type == 'youtube':
-                            url = f'https://www.youtube.com/channel/{id}'
-                            accounts.append(f'[YouTube {verified}]({url})')
-                        else:
-                            accounts.append(f'{type}: {name} `{id}` {verified}')
-
+                    accounts = self._connected_accounts(profile.connected_accounts)
                     if accounts:
-                        embed.add_field(name='Connected Accounts:', value=', '.join(accounts))
+                        embed.add_field(name='Connected Accounts:', value=accounts)
 
             await ctx.send(embed=embed)
 
