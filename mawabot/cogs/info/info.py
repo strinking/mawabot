@@ -28,6 +28,7 @@ __all__ = [
 CHANNEL_REGEX = re.compile(r'<#([0-9]+)>')
 MENTION_REGEX = re.compile(r'<@!?([0-9]+)>')
 EMOJI_REGEX = re.compile(r'<:([A-Za-z~\-0-9]+):([0-9]+)>')
+SPOTIFY_OPEN_URL = 'http://open.spotify.com/track/'
 
 class Information:
     __slots__ = (
@@ -76,6 +77,12 @@ class Information:
 
         profiles = await asyncio.gather(*[self._get_profile(uid) for uid in uids])
         return list(filter(lambda t: t[1] is not None, profiles))
+
+    def _get_member(self, user_id):
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                if member.id == user_id:
+                    return member
 
     @staticmethod
     def _connected_accounts(connected_accounts):
@@ -150,41 +157,11 @@ class Information:
                 if profile.hypesquad:
                     lines.append('- Hypesquad')
 
-            if isinstance(user, discord.Member):
-                if user.game:
-                    if user.game.type == 1:
-                        lines.append(f'Streaming [{user.game.name}]({user.game.url})')
-                    else:
-                        lines.append(f'Playing `{user.game.name}`')
-
-                if user.voice:
-                    mute = user.voice.mute or user.voice.self_mute
-                    deaf = user.voice.deaf or user.voice.self_deaf
-
-                    states = []
-                    if mute:
-                        states.append('muted')
-                    if deaf:
-                        states.append('deafened')
-
-                    if states:
-                        state = ', '.join(states)
-                    else:
-                        state = 'active'
-
-                    lines.append(f'Voice: {state}')
-
-                if user.nick:
-                    lines.append(f'Nickname: {user.nick}')
-
-                roles = ' '.join(map(lambda r: r.mention, user.roles[1:]))
-                if roles:
-                    lines.append(f'Roles: {roles}')
-
+            member = self._get_member(user.id)
+            activity = member.activity
+            
             embed = discord.Embed(type='rich', description='\n'.join(lines))
             embed.timestamp = user.created_at
-            if hasattr(user, 'color'):
-                embed.color = user.color
 
             name = f'{user.name}#{user.discriminator}'
             embed.set_author(name=name)
@@ -204,6 +181,28 @@ class Information:
                     accounts = self._connected_accounts(profile.connected_accounts)
                     if accounts:
                         embed.add_field(name='Connected Accounts:', value=accounts)
+            
+            if activity is not None:
+                # User is currently using spotify
+                if activity.type == discord.ActivityType.listening:
+                    actitivty_info = [
+                        f'[[{activity.album}] {activity.artist} {activity.title}]({SPOTIFY_OPEN_URL}{activity.track_id})',
+                        f'Duration: {str(activity.duration).split(".")[0]}',
+                    ]
+                    embed.add_field(name='Listening to:', value='\n'.join(actitivty_info))
+                    embed.color = 1947988
+                
+                # User is streaming
+                elif activity.type == discord.ActivityType.streaming:
+                    actitivty_info = f'[{activity.name} on {activity.twitch_name}]({activity.url})'                    
+                    embed.add_field(name=f'Streaming {activity.details}:', value=actitivty_info)
+                    embed.color = 5846677
+                
+                else:
+                    if hasattr(activity, 'details'):
+                        embed.add_field(name=f'Playing {activity.name}:', value=activity.details)
+                    else:
+                        embed.add_field(name='Playing:', value=activity.name)
 
             await ctx.send(embed=embed)
 

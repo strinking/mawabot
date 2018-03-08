@@ -152,14 +152,17 @@ class Reddit:
     @commands.command()
     @check_reddit
     async def headpat(self, ctx):
+        ''' Gets a random headpat image from /headpats '''
         await self.safe_or_react(ctx, '/r/headpats/random')
 
     @commands.command()
     @check_reddit
     async def megane(self, ctx):
+        ''' Gets a random megane image from /megane '''
         await self.safe_or_react(ctx, '/r/megane/random')
 
     @commands.command()
     @check_reddit
     async def hentai(self, ctx):
+        ''' Gets a random image from /hentai '''
         await self.safe_or_react(ctx, '/r/hentai/random', attempts=1)
